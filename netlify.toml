@@ -1,0 +1,166 @@
+# iPoolGo France : site statique + Netlify Functions (Mollie, Brevo).
+# Les clés se règlent dans Netlify (Site configuration > Environment variables), jamais ici.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[functions]
+  node_bundler = "esbuild"
+
+# ------------------------------------------------------------ redirections
+
+# Un seul domaine : https://ipoolgofrance.fr
+[[redirects]]
+  from = "https://ipoolgofrance.com/*"
+  to = "https://ipoolgofrance.fr/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.ipoolgofrance.com/*"
+  to = "https://ipoolgofrance.fr/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://ipoolgofrance.com/*"
+  to = "https://ipoolgofrance.fr/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.ipoolgofrance.com/*"
+  to = "https://ipoolgofrance.fr/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.ipoolgofrance.fr/*"
+  to = "https://ipoolgofrance.fr/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.ipoolgofrance.fr/*"
+  to = "https://ipoolgofrance.fr/:splat"
+  status = 301
+  force = true
+
+# Fichiers du dépôt qui n'ont pas à être servis au public.
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/tests/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/scripts/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/netlify.toml"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/package.json"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/README.md"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/.env.example"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/.gitignore"
+  to = "/404.html"
+  status = 404
+  force = true
+
+# ------------------------------------------------------------ en-têtes
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+
+# Images et polices : leur nom change quand leur contenu change.
+[[headers]]
+  for = "/assets/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# CSS et JS gardent le même nom : le navigateur revalide, pour que les prix restent à jour.
+[[headers]]
+  for = "/assets/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/assets/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/google-shopping.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+    X-Robots-Tag = "noindex"
+
+[[headers]]
+  for = "/llms.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+
+[[headers]]
+  for = "/merci.html"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+    Cache-Control = "no-store"
+

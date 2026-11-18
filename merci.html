@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suivi de votre paiement | iPoolGo France</title>
+<meta name="description" content="État de votre paiement et récapitulatif de votre commande iPoolGo France.">
+<link rel="canonical" href="https://ipoolgofrance.fr/merci.html">
+<meta name="robots" content="noindex, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="iPoolGo France">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Suivi de votre paiement | iPoolGo France">
+<meta property="og:description" content="État de votre paiement et récapitulatif de votre commande iPoolGo France.">
+<meta property="og:url" content="https://ipoolgofrance.fr/merci.html">
+<meta property="og:image" content="https://ipoolgofrance.fr/assets/images/og-ipoolgo-france.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Piscine gonflable rigide iPoolGo ronde installée dans un jardin">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Suivi de votre paiement | iPoolGo France">
+<meta name="twitter:description" content="État de votre paiement et récapitulatif de votre commande iPoolGo France.">
+<meta name="twitter:image" content="https://ipoolgofrance.fr/assets/images/og-ipoolgo-france.jpg">
+<meta name="twitter:image:alt" content="Piscine gonflable rigide iPoolGo ronde installée dans un jardin">
+<meta name="theme-color" content="#005f73">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/instrument-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/style.css">
+<script src="/assets/js/catalog.js" defer></script>
+<script src="/assets/js/app.js" defer></script>
+</head>
+<body>
+<a class="evitement" href="#contenu">Aller au contenu</a>
+<div class="cookies" data-cookies role="region" aria-label="Cookies" hidden>
+  <div class="cookies__contenu">
+    <p>Avec votre accord, nous mesurons la fréquentation du site avec Google Analytics. Sans accord, aucun cookie de mesure n’est déposé. <a href="/mentions-legales.html#cookies">En savoir plus</a></p>
+    <div class="cookies__actions">
+      <button type="button" class="bouton" data-cookies-choix="refuse">Refuser</button>
+      <button type="button" class="bouton" data-cookies-choix="accepte">Accepter</button>
+    </div>
+  </div>
+</div>
+<header class="entete">
+  <div class="conteneur entete__barre">
+    <a class="marque" href="/" aria-label="iPoolGo France, accueil">
+      <img src="/assets/images/logo-ipoolgo.webp" alt="iPoolGo" width="132" height="22">
+      <span>France</span>
+    </a>
+    <nav class="menu" aria-label="Navigation principale">
+      <ul>
+        <li><a href="/piscine-ronde-ipoolgo.html">Piscine ronde</a></li>
+        <li><a href="/piscine-rectangulaire-ipoolgo.html">Piscine rectangulaire</a></li>
+        <li><a href="/comparatif-piscine-ipoolgo.html">Comparatif</a></li>
+        <li><a href="/#avis">Avis</a></li>
+      </ul>
+    </nav>
+    <a class="bouton bouton--petit" href="/#commander">Commander</a>
+  </div>
+</header>
+<main id="contenu">
+<div class="conteneur conteneur--etroit merci" data-merci>
+  <section data-etat="verification" aria-live="polite">
+    <h1>Nous vérifions votre paiement</h1>
+    <p class="chapo">Cela prend quelques secondes. Gardez cette page ouverte.</p>
+    <noscript><p class="message message--info">Cette page a besoin de JavaScript pour afficher l’état de votre paiement. Si vous avez payé, vous recevrez la confirmation par e-mail.</p></noscript>
+  </section>
+
+  <section data-etat="paye" hidden>
+    <h1>Merci, votre commande est payée</h1>
+    <p class="chapo">Nous vous envoyons la confirmation par e-mail. SAS Virage prépare votre piscine et vous contacte pour la livraison, sous 5 à 10 jours ouvrés si elle est en stock.</p>
+
+      <div class="recap">
+        <p class="recap__titre" data-out="produit"></p>
+        <dl class="recap__lignes">
+          <div><dt>Piscine</dt><dd data-out="prix"></dd></div>
+          <div class="recap__offert"><dt>Pompe de gonflage et filtration à sable</dt><dd>Offertes</dd></div>
+          <div><dt>Livraison en France métropolitaine</dt><dd data-out="livraison"></dd></div>
+          <div class="recap__total"><dt>Total TTC</dt><dd data-out="total"></dd></div>
+        </dl>
+        <p class="recap__note">Référence du paiement&nbsp;: <span data-out="reference"></span></p>
+      </div>
+    <p class="merci__suite">Pas d’e-mail dans l’heure&#8239;? Regardez dans vos courriers indésirables. Une question&#8239;? Écrivez à <a href="mailto:contact@piscineipoolgo.com">contact@piscineipoolgo.com</a> ou appelez le <a href="tel:+33780806764">07 80 80 67 64</a>.</p>
+    <p class="merci__actions"><a class="bouton bouton--contour" href="/">Revenir à l’accueil</a></p>
+  </section>
+
+  <section data-etat="attente" hidden>
+    <h1>Votre paiement est en cours de validation</h1>
+    <p class="chapo">Votre banque n’a pas encore confirmé le paiement. Inutile de payer une seconde fois&nbsp;: cette page se met à jour toute seule, et vous recevrez un e-mail dès que le paiement est validé.</p>
+
+      <div class="recap">
+        <p class="recap__titre" data-out="produit"></p>
+        <dl class="recap__lignes">
+          <div><dt>Piscine</dt><dd data-out="prix"></dd></div>
+          <div class="recap__offert"><dt>Pompe de gonflage et filtration à sable</dt><dd>Offertes</dd></div>
+          <div><dt>Livraison en France métropolitaine</dt><dd data-out="livraison"></dd></div>
+          <div class="recap__total"><dt>Total TTC</dt><dd data-out="total"></dd></div>
+        </dl>
+        <p class="recap__note">Référence du paiement&nbsp;: <span data-out="reference"></span></p>
+      </div>
+    <p class="merci__actions">
+      <button type="button" class="bouton" data-verifier>Vérifier à nouveau</button>
+      <a class="bouton bouton--contour" href="/#commander">Réessayer le paiement</a>
+    </p>
+    <p class="merci__suite">Ne relancez un paiement que si celui-ci échoue, pour éviter d’être débité deux fois. Une question&#8239;? Écrivez à <a href="mailto:contact@piscineipoolgo.com">contact@piscineipoolgo.com</a> ou appelez le <a href="tel:+33780806764">07 80 80 67 64</a>.</p>
+  </section>
+
+  <section data-etat="echec" hidden>
+    <h1>Le paiement n’a pas abouti</h1>
+    <p class="chapo"><span data-out="motif">Le paiement n’a pas été finalisé.</span> Vous n’avez pas été débité et votre commande n’est pas enregistrée.</p>
+    <p class="merci__suite">Vos coordonnées sont restées dans le formulaire&nbsp;: vous pouvez relancer le paiement sans les ressaisir, avec la même carte ou une autre.</p>
+    <p class="merci__actions">
+      <a class="bouton bouton--large" href="/#commander">Réessayer le paiement</a>
+    </p>
+    <p class="merci__suite">Une question&#8239;? Écrivez à <a href="mailto:contact@piscineipoolgo.com">contact@piscineipoolgo.com</a> ou appelez le <a href="tel:+33780806764">07 80 80 67 64</a>.</p>
+  </section>
+
+  <section data-etat="inconnu" hidden>
+    <h1>Nous ne retrouvons pas de paiement en cours</h1>
+    <p class="chapo">Cette page affiche l’état d’un paiement lancé depuis ce navigateur. Si vous avez payé depuis un autre appareil, la confirmation vous arrive par e-mail.</p>
+    <p class="merci__actions">
+      <a class="bouton" href="/#commander">Réessayer le paiement</a>
+      <a class="bouton bouton--contour" href="/">Revenir à l’accueil</a>
+    </p>
+    <p class="merci__suite">Une question&#8239;? Écrivez à <a href="mailto:contact@piscineipoolgo.com">contact@piscineipoolgo.com</a> ou appelez le <a href="tel:+33780806764">07 80 80 67 64</a>.</p>
+  </section>
+
+  <section data-etat="erreur" hidden>
+    <h1>Impossible de vérifier le paiement pour l’instant</h1>
+    <p class="chapo">La vérification n’a pas répondu, sans doute à cause de la connexion. Si vous avez payé, vous recevrez la confirmation par e-mail.</p>
+    <p class="merci__actions">
+      <button type="button" class="bouton" data-verifier>Vérifier à nouveau</button>
+      <a class="bouton bouton--contour" href="/#commander">Réessayer le paiement</a>
+    </p>
+    <p class="merci__suite">Ne relancez un paiement qu’après avoir vérifié que le premier a échoué. Une question&#8239;? Écrivez à <a href="mailto:contact@piscineipoolgo.com">contact@piscineipoolgo.com</a> ou appelez le <a href="tel:+33780806764">07 80 80 67 64</a>.</p>
+  </section>
+</div>
+</main>
+<footer class="pied">
+  <div class="conteneur">
+    <div class="pied__grille">
+      <div>
+        <p class="pied__marque">iPoolGo France</p>
+        <p>Revendeur officiel iPoolGo en France. Les piscines sont vendues, expédiées et suivies depuis la France par SAS Virage.</p>
+      </div>
+      <div>
+        <p class="pied__titre">Piscines</p>
+        <ul>
+          <li><a href="/piscine-ronde-ipoolgo.html">Piscine iPoolGo Ronde</a></li>
+          <li><a href="/piscine-rectangulaire-ipoolgo.html">Piscine iPoolGo Rectangulaire</a></li>
+          <li><a href="/comparatif-piscine-ipoolgo.html">Comparatif des piscines hors-sol</a></li>
+          <li><a href="/#commander">Commander</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="pied__titre">Informations</p>
+        <ul>
+          <li><a href="/cgv.html">Conditions Générales de Vente</a></li>
+          <li><a href="/mentions-legales.html">Mentions légales</a></li>
+          <li><a href="/mentions-legales.html#confidentialite">Confidentialité</a></li>
+          <li><button type="button" class="lien-bouton" data-cookies-ouvrir>Gérer les cookies</button></li>
+        </ul>
+      </div>
+      <div>
+        <p class="pied__titre">Service après-vente</p>
+        <address>
+          SAS Virage<br>
+          10 rue Louis Vicat, 75015 Paris<br>
+          <a href="mailto:contact@piscineipoolgo.com">contact@piscineipoolgo.com</a><br>
+          <a href="tel:+33780806764">07 80 80 67 64</a>
+        </address>
+      </div>
+    </div>
+    <p class="pied__bas">© 2026 SAS Virage, SIRET 892&#8239;260&#8239;712 00021. Paiement sécurisé par Mollie. iPoolGo est une marque de son propriétaire.</p>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,25 @@
+# iPoolGo France : https://ipoolgofrance.fr
+# Moteurs de recherche et assistants IA sont les bienvenus sur tout le site public.
+
+User-agent: *
+Allow: /
+Disallow: /.netlify/
+
+# Robots des moteurs et assistants IA, autorisés explicitement.
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: Google-Extended
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Applebot
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /.netlify/
+
+Sitemap: https://ipoolgofrance.fr/sitemap.xml

@@ -1,0 +1,20 @@
+# Secrets : les clés vivent dans les variables d'environnement Netlify.
+.env
+.env.*
+!.env.example
+
+# Dépendances et outils (le site n'en a aucune).
+node_modules/
+package-lock.json
+.netlify/
+
+# Fichiers temporaires.
+_scratch/
+tmp/
+*.tmp
+*.log
+*.bak
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

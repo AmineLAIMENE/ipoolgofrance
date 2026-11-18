@@ -1,0 +1,63 @@
+# iPoolGo France
+
+> iPoolGo est une marque de piscines hors-sol gonflables rigides. iPoolGo France (https://ipoolgofrance.fr) est la boutique en ligne de SAS Virage, revendeur officiel des piscines iPoolGo en France. Les piscines sont vendues, expédiées et suivies depuis la France par SAS Virage (Paris). Une piscine iPoolGo est une piscine hors-sol gonflable rigide : ses parois en Drop-Stitch se gonflent à haute pression en 20 à 30 minutes et tiennent debout sans armature métallique. Chaque piscine est livrée avec une pompe de gonflage électrique et une filtration à sable offertes.
+
+Site en français. Prix TTC en euros. Livraison en France métropolitaine uniquement. Mise à jour : 19 novembre 2026.
+
+## Pages
+
+- [Accueil et commande](https://ipoolgofrance.fr/): les deux modèles, le sélecteur de taille avec prix, les avis d'acheteurs et le formulaire de commande.
+- [Piscine iPoolGo Ronde](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html): 9 tailles de Ø 2 m à Ø 6 m, fiche technique, installation, entretien, questions fréquentes.
+- [Piscine iPoolGo Rectangulaire](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html): 8 formats de 2 × 2 m à 6 × 5 m, fiche technique, installation sur terrasse, questions fréquentes.
+- [Comparatif des piscines hors-sol](https://ipoolgofrance.fr/comparatif-piscine-ipoolgo.html): Drop-Stitch, autoportante à boudin et tubulaire comparées (montage, parois, prix, rangement, réglementation), avec les sources.
+- [Conditions Générales de Vente](https://ipoolgofrance.fr/cgv.html): prix, paiement, livraison, rétractation sous 14 jours, garanties légales.
+- [Mentions légales et confidentialité](https://ipoolgofrance.fr/mentions-legales.html): éditeur, hébergeur, données personnelles, cookies.
+
+## Prix et tailles
+
+<!-- catalog:prix-llms -->
+### Piscine iPoolGo Ronde (9 tailles)
+
+- Ø 2 m × 1 m : 999.00 EUR TTC, 1 à 2 personnes, environ 2800 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=200x100)
+- Ø 3 m × 1,20 m : 1399.00 EUR TTC, 2 à 3 personnes, environ 7600 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=300x120)
+- Ø 3 m × 1,50 m : 1599.00 EUR TTC, 2 à 3 personnes, environ 9500 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=300x150)
+- Ø 3,7 m × 1,20 m : 1699.00 EUR TTC, 3 à 4 personnes, environ 11500 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=370x120)
+- Ø 4 m × 1,20 m : 1899.00 EUR TTC, 4 à 5 personnes, environ 13300 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=400x120)
+- Ø 4 m × 1,50 m : 2000.00 EUR TTC, 5 à 6 personnes, environ 17000 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=400x150)
+- Ø 5 m × 1,20 m : 2200.00 EUR TTC, 5 à 7 personnes, environ 20700 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=500x120)
+- Ø 5 m × 1,50 m : 2600.00 EUR TTC, 6 à 7 personnes, environ 26000 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=500x150)
+- Ø 6 m × 1,50 m : 3400.00 EUR TTC, 8 à 10 personnes, environ 37300 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=600x150)
+
+### Piscine iPoolGo Rectangulaire (8 tailles)
+
+- Compact, 2 × 2 × 1,20 m : 1599.00 EUR TTC, 2 à 3 personnes, environ 4200 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=200x200)
+- Family, 3 × 2 × 1,20 m : 1999.00 EUR TTC, 2 à 4 personnes, environ 6500 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=300x200)
+- Lane, 4 × 3 × 1,20 m : 2999.00 EUR TTC, 4 à 5 personnes, environ 12600 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=400x300)
+- Square, 4 × 4 × 1,20 m : 3490.00 EUR TTC, 6 à 8 personnes, environ 16900 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=400x400)
+- Lounge, 5 × 4 × 1,20 m : 4490.00 EUR TTC, jusqu'à 8 personnes, environ 21100 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=500x400)
+- Swim, 6 × 3 × 1,20 m : 4200.00 EUR TTC, 7 à 9 personnes, environ 19000 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=600x300)
+- Family Plus, 6 × 4 × 1,20 m : 4999.00 EUR TTC, 8 à 10 personnes, environ 25500 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=600x400)
+- Resort, 6 × 5 × 1,20 m : 5500.00 EUR TTC, 10 à 12 personnes, environ 31700 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=600x500)
+
+Livraison en France métropolitaine : 360.00 EUR par commande.
+Offerts avec chaque piscine : pompe de gonflage électrique (valeur 150 EUR) et système de filtration à sable (valeur 290 EUR).
+<!-- /catalog:prix-llms -->
+
+## Faits utiles
+
+- Technologie : Drop-Stitch, deux nappes de PVC reliées par des milliers de fils de polyester et gonflées à haute pression. PVC renforcé 1000D en 7 couches de 0,9 mm d'après le fabricant.
+- Montage : 20 à 30 minutes de gonflage avec la pompe électrique fournie, sans outil ni pièce à assembler. Le remplissage prend ensuite plusieurs heures (environ 1 000 L par heure avec un tuyau d'arrosage).
+- Contenu du colis : la piscine, un kit de réparation, une pompe de gonflage électrique sur batterie et une filtration à sable (débit 8 705 L/h).
+- Coloris : Emerald Grey.
+- Sols adaptés : pelouse, béton, dallage ou gravier compacté, plans et de niveau.
+- Délai : 5 à 10 jours ouvrés pour un modèle en stock. Les piscines de plus de 5 m sont livrées sur rendez-vous.
+- Rétractation : 14 jours après la livraison, frais de retour à la charge du client.
+- Garanties : garantie légale de conformité de 2 ans et garantie des vices cachés.
+- Paiement : par carte sur la page sécurisée de Mollie.
+- Urbanisme : aucune formalité pour un bassin de 10 m² ou moins hors secteur protégé, ni pour une piscine installée 3 mois par an au maximum. Déclaration préalable entre 10 et 100 m². Source : https://www.service-public.gouv.fr/particuliers/vosdroits/F31404
+
+## Vendeur et contact
+
+- Vendeur : SAS Virage (raison sociale VIRAGE), 10 rue Louis Vicat, 75015 Paris, SIRET 892 260 712 00021.
+- Service après-vente : contact@piscineipoolgo.com, 07 80 80 67 64.
+- Flux produits Google Merchant : https://ipoolgofrance.fr/google-shopping.xml
