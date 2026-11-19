@@ -1469,6 +1469,21 @@ strong {
   white-space: nowrap;
 }
 
+.remises {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 0.6rem;
+}
+
+.remise__note {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.9rem;
+  background: #f3fbfa;
+  border-radius: var(--rayon-moyen);
+  color: var(--encre-douce);
+  font-size: 0.925rem;
+}
+
 .champs {
   display: grid;
   gap: 1rem;

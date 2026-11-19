@@ -123,6 +123,14 @@
 <!-- /catalog:tailles-rectangulaire -->
           </div>
         </fieldset>
+        <fieldset class="bloc">
+          <legend>3. Livraison ou retrait</legend>
+          <div class="remises">
+            <label class="taille remise"><input type="radio" name="remise" value="livraison" checked><span class="taille__nom">Livraison à domicile</span><span class="taille__info">France métropolitaine, 5 à 10 jours ouvrés</span><span class="taille__prix" data-catalog="livraison">360&nbsp;€</span></label>
+            <label class="taille remise"><input type="radio" name="remise" value="retrait"><span class="taille__nom">Retrait sur place</span><span class="taille__info">Noisy-le-Grand (Île-de-France), sur rendez-vous</span><span class="taille__prix">Gratuit</span></label>
+          </div>
+          <p class="remise__note" data-remise="retrait" hidden>Après la commande, nous vous appelons sous 2 jours ouvrés pour fixer le jour du retrait et vous donner l’adresse exacte. Prévoyez un véhicule assez grand pour les cartons.</p>
+        </fieldset>
       </div>
 
       <aside class="commande__recap recap" aria-label="Récapitulatif de votre commande">
@@ -136,7 +144,7 @@
           <div><dt>Piscine</dt><dd data-out="prix" data-catalog="ronde.300x120.prix">1&#8239;399&nbsp;€</dd></div>
           <div class="recap__offert"><dt>Pompe de gonflage électrique</dt><dd><s><span data-catalog="pompe">150&nbsp;€</span></s> Offerte</dd></div>
           <div class="recap__offert"><dt>Filtration à sable</dt><dd><s><span data-catalog="filtration">290&nbsp;€</span></s> Offerte</dd></div>
-          <div><dt>Livraison en France métropolitaine</dt><dd data-out="livraison" data-catalog="livraison">360&nbsp;€</dd></div>
+          <div><dt data-out="remise-libelle">Livraison en France métropolitaine</dt><dd data-out="livraison" data-catalog="livraison">360&nbsp;€</dd></div>
           <div class="recap__total" aria-live="polite" aria-atomic="true"><dt>Total TTC</dt><dd data-out="total" data-catalog="ronde.300x120.total">1&#8239;759&nbsp;€</dd></div>
         </dl>
         <p class="recap__note" data-out="urbanisme"></p>
@@ -144,7 +152,7 @@
 
       <div class="commande__client">
         <fieldset class="bloc">
-          <legend>3. Vos coordonnées de livraison</legend>
+          <legend>4. Vos coordonnées<span data-remise="livraison"> de livraison</span></legend>
           <div class="champs">
           <div class="champ champ--moitie">
             <label for="champ-prenom">Prénom</label>
@@ -161,11 +169,12 @@
           <div class="champ champ--moitie">
             <label for="champ-telephone">Téléphone</label>
             <input id="champ-telephone" name="telephone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" aria-describedby="aide-telephone" required>
-            <small class="champ__aide" id="aide-telephone">Pour que le transporteur puisse vous joindre.</small>
+            <small class="champ__aide" id="aide-telephone"><span data-remise="livraison">Pour que le transporteur puisse vous joindre.</span><span data-remise="retrait" hidden>Pour convenir avec vous du jour du retrait.</span></small>
           </div>
           <div class="champ">
             <label for="champ-adresse">Adresse</label>
             <input id="champ-adresse" name="adresse" type="text" autocomplete="street-address" maxlength="120" required>
+            <small class="champ__aide" data-remise="retrait" hidden>Votre adresse figure sur la facture.</small>
           </div>
           <div class="champ champ--tiers">
             <label for="champ-codePostal">Code postal</label>

@@ -259,7 +259,7 @@
     var planSvg = $('[data-plan]', root);
     var planParts = planSvg ? createPlan(planSvg) : null;
     var listeners = [];
-    var state = { model: fixedModel || catalog.MODEL_IDS[0], size: null };
+    var state = { model: fixedModel || catalog.MODEL_IDS[0], size: null, mode: catalog.DEFAULT_MODE };
 
     function checkedSize(modelId) {
       var input = $('input[name="taille-' + modelId + '"]:checked', root);
@@ -267,9 +267,10 @@
     }
 
     function render() {
-      var quote = catalog.quote(state.model, state.size);
+      var quote = catalog.quote(state.model, state.size, state.mode);
       if (!quote) return;
       var size = quote.size;
+      var pickup = quote.mode.id === 'retrait';
 
       $all('input[name="modele"]', root).forEach(function (input) {
         input.checked = input.value === state.model;
@@ -281,6 +282,12 @@
       $all('input[name="taille-' + state.model + '"]', root).forEach(function (input) {
         input.checked = input.value === state.size;
       });
+      $all('input[name="remise"]', root).forEach(function (input) {
+        input.checked = input.value === state.mode;
+      });
+      $all('[data-remise]', root).forEach(function (element) {
+        element.hidden = element.getAttribute('data-remise') !== state.mode;
+      });
 
       var values = {
         produit: nb(quote.label),
@@ -290,7 +297,8 @@
         volume: 'environ ' + litres(size.volume),
         emprise: decimal(catalog.groundArea(size)) + NBSP + 'm²',
         prix: catalog.formatEUR(quote.price),
-        livraison: quote.shipping > 0 ? catalog.formatEUR(quote.shipping) : 'Offerte',
+        livraison: quote.shipping > 0 ? catalog.formatEUR(quote.shipping) : pickup ? 'Gratuit' : 'Offerte',
+        'remise-libelle': quote.mode.label,
         total: catalog.formatEUR(quote.total),
         urbanisme: urbanismHint(size)
       };
@@ -316,7 +324,9 @@
       render();
       if (silent) return;
 
-      var query = isOrderForm ? '?modele=' + modelId + '&taille=' + sizeId : '?taille=' + sizeId;
+      var query = isOrderForm
+        ? '?modele=' + modelId + '&taille=' + sizeId + (state.mode !== catalog.DEFAULT_MODE ? '&remise=' + state.mode : '')
+        : '?taille=' + sizeId;
       try {
         history.replaceState(null, '', location.pathname + query + location.hash);
       } catch (error) {
@@ -329,6 +339,10 @@
       var input = event.target;
       if (input.name === 'modele') select(input.value, null);
       else if (input.name === 'taille-' + state.model) select(state.model, input.value);
+      else if (input.name === 'remise' && catalog.getMode(input.value)) {
+        state.mode = input.value;
+        select(state.model, state.size);
+      }
     });
 
     // Sélection initiale : adresse de la page, puis commande en cours, puis valeurs par défaut.
@@ -341,6 +355,10 @@
       size = saved.taille;
     } else if (model && !catalog.getSize(model, size) && saved.modele === model) {
       size = saved.taille;
+    }
+    if (isOrderForm) {
+      var mode = params.get('remise') || saved.remise;
+      if (catalog.getMode(mode)) state.mode = mode;
     }
     select(model || state.model, size, true);
 
@@ -358,7 +376,7 @@
   var EMAIL = /^[^\s@<>"']+@[^\s@<>"']+\.[a-z]{2,}$/i;
   var PHONE = /^\+?[0-9]{9,15}$/;
 
-  function fieldError(name, value) {
+  function fieldError(name, value, mode) {
     if (!value) return 'Ce champ est obligatoire.';
     if (value.length > LIMITS[name]) return LIMITS[name] + ' caractères maximum.';
     if (name === 'email' && !EMAIL.test(value)) return 'Vérifiez l’adresse e-mail, par exemple prenom@exemple.fr.';
@@ -367,7 +385,7 @@
     }
     if (name === 'codePostal') {
       if (!/^[0-9]{5}$/.test(value)) return 'Le code postal compte 5 chiffres.';
-      if (/^9[78]/.test(value)) return 'Nous livrons en France métropolitaine. Écrivez-nous pour une autre destination.';
+      if (mode !== 'retrait' && /^9[78]/.test(value)) return 'Nous livrons en France métropolitaine. Écrivez-nous pour une autre destination.';
     }
     return '';
   }
@@ -395,6 +413,7 @@
       var data = values();
       data.modele = configurator.state.model;
       data.taille = configurator.state.size;
+      data.remise = configurator.state.mode;
       write('sessionStorage', KEYS.order, JSON.stringify(data));
     }
 
@@ -471,7 +490,7 @@
       var customer = values();
       var errors = {};
       FIELDS.forEach(function (name) {
-        var error = fieldError(name, customer[name]);
+        var error = fieldError(name, customer[name], configurator.state.mode);
         if (error) errors[name] = error;
       });
       if (!showErrors(errors)) return;
@@ -481,7 +500,7 @@
         return;
       }
 
-      var quote = catalog.quote(configurator.state.model, configurator.state.size);
+      var quote = catalog.quote(configurator.state.model, configurator.state.size, configurator.state.mode);
       save();
       setSending(true);
 
@@ -491,6 +510,7 @@
         body: JSON.stringify({
           modele: quote.model.id,
           taille: quote.size.id,
+          remise: quote.mode.id,
           montant: quote.total,
           cgv: true,
           client: customer,
@@ -566,11 +586,13 @@
 
     function fill(order) {
       var shipping = Number(order.livraison);
+      var mode = catalog.getMode(order.remise) || catalog.getMode(catalog.DEFAULT_MODE);
       var values = {
         reference: order.reference || paymentId,
         produit: nb(order.produit || ''),
         prix: catalog.formatEUR(Number(order.prix)),
-        livraison: shipping > 0 ? catalog.formatEUR(shipping) : 'Offerte',
+        livraison: shipping > 0 ? catalog.formatEUR(shipping) : mode.free ? 'Gratuit' : 'Offerte',
+        'remise-libelle': mode.label,
         total: catalog.formatEUR(Number(order.total))
       };
       $all('[data-out]', root).forEach(function (output) {

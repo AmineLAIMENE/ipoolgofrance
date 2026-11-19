@@ -348,7 +348,7 @@ function renderLlmsPrices() {
     lines.push('');
   });
   lines.push(
-    `Livraison en France métropolitaine : ${catalog.formatAmount(catalog.SHIPPING_EUR)} EUR par commande.`,
+    `Livraison en France métropolitaine : ${catalog.formatAmount(catalog.SHIPPING_EUR)} EUR par commande. Retrait gratuit à ${catalog.PICKUP_PLACE} (Île-de-France), sur rendez-vous.`,
     `Offerts avec chaque piscine : ${catalog.GIFTS.map((gift) => `${gift.name.toLowerCase()} (valeur ${gift.value} EUR)`).join(' et ')}.`
   );
   return lines.join('\n');

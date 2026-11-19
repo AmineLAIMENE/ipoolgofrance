@@ -46,6 +46,7 @@ exports.handler = async function handler(event) {
       taille: metadata.taille,
       produit: metadata.produit,
       prix: metadata.prix,
+      remise: metadata.remise || 'livraison',
       livraison: metadata.livraison,
       total: payment.amount.value,
       devise: payment.amount.currency

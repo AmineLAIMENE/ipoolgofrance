@@ -44,7 +44,7 @@ function clean(value) {
   return value.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function validateCustomer(input) {
+function validateCustomer(input, mode) {
   const customer = {};
   const errors = {};
   const source = input && typeof input === 'object' ? input : {};
@@ -70,7 +70,7 @@ function validateCustomer(input) {
   if (!errors.codePostal) {
     if (!POSTAL_CODE.test(customer.codePostal)) {
       errors.codePostal = 'Code postal à 5 chiffres attendu.';
-    } else if (/^9[78]/.test(customer.codePostal)) {
+    } else if (mode === 'livraison' && /^9[78]/.test(customer.codePostal)) {
       errors.codePostal = 'Livraison en France métropolitaine uniquement. Contactez-nous pour une autre destination.';
     }
   }
@@ -106,7 +106,13 @@ exports.handler = async function handler(event) {
     return json(400, { error: 'requete_invalide', message: 'Requête refusée.' });
   }
 
-  const quote = catalog.quote(input.modele, input.taille);
+  // Sans mode indiqué, la commande est livrée.
+  const modeId = input.remise === undefined ? catalog.DEFAULT_MODE : input.remise;
+  if (!catalog.getMode(modeId)) {
+    return json(400, { error: 'remise_invalide', message: 'Choisissez la livraison ou le retrait.' });
+  }
+
+  const quote = catalog.quote(input.modele, input.taille, modeId);
   if (!quote) {
     return json(400, { error: 'produit_inconnu', message: 'Ce modèle ou cette taille n’existe pas.' });
   }
@@ -127,7 +133,7 @@ exports.handler = async function handler(event) {
     });
   }
 
-  const { customer, errors } = validateCustomer(input.client);
+  const { customer, errors } = validateCustomer(input.client, quote.mode.id);
   if (Object.keys(errors).length > 0) {
     return json(400, { error: 'champs_invalides', message: 'Certains champs sont à corriger.', champs: errors });
   }
@@ -141,6 +147,7 @@ exports.handler = async function handler(event) {
     taille: quote.size.id,
     produit: quote.label,
     prix: catalog.formatAmount(quote.price),
+    remise: quote.mode.id,
     livraison: catalog.formatAmount(quote.shipping),
     total: catalog.formatAmount(quote.total),
     cgv_acceptees: now.toISOString()
@@ -160,7 +167,7 @@ exports.handler = async function handler(event) {
   }
 
   const site = siteUrl();
-  const back = new URLSearchParams({ modele: quote.model.id, taille: quote.size.id });
+  const back = new URLSearchParams({ modele: quote.model.id, taille: quote.size.id, remise: quote.mode.id });
   // Les moyens de paiement proposés sont ceux activés dans le tableau de bord Stripe.
   const session = {
     mode: 'payment',

@@ -45,7 +45,7 @@ npm run sync   # réécrit les prix dans les pages, les données structurées, l
 npm test       # vérifie le site et les fonctions
 ```
 
-`SHIPPING_EUR` fixe les frais de livraison (0 pour une livraison offerte).
+`SHIPPING_EUR` fixe les frais de livraison (0 pour une livraison offerte). `DELIVERY_MODES` liste les modes de remise proposés à la commande : livraison ou retrait gratuit à Noisy-le-Grand (`PICKUP_PLACE`).
 
 `testSizes` (modèle `ronde`) contient la « Piscine test ronde » à 1 €, port offert, pour une commande réelle
 d'essai : `https://ipoolgofrance.fr/commande.html?modele=ronde&taille=test-1m`. Elle n'apparaît dans aucune page,

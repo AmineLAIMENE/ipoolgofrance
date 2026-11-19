@@ -22,6 +22,15 @@
   // Livraison France métropolitaine, tarif unique en euros TTC (0 = livraison offerte).
   var SHIPPING_EUR = 360;
 
+  // Modes de remise proposés à la commande. Le retrait est gratuit, sur rendez-vous ;
+  // l'adresse exacte est donnée au client par e-mail après la commande.
+  var PICKUP_PLACE = 'Noisy-le-Grand';
+  var DELIVERY_MODES = {
+    livraison: { id: 'livraison', label: 'Livraison en France métropolitaine' },
+    retrait: { id: 'retrait', label: 'Retrait à ' + PICKUP_PLACE, free: true }
+  };
+  var DEFAULT_MODE = 'livraison';
+
   // Offerts avec chaque piscine (valeurs constatées sur la boutique SAS Virage).
   var GIFTS = [
     { id: 'pompe', name: 'Pompe de gonflage électrique', value: 150 },
@@ -160,15 +169,22 @@
     return GIFTS.reduce(function (sum, gift) { return sum + gift.value; }, 0);
   }
 
-  // Devis recalculé à partir du seul couple modèle + taille.
-  function quote(modelId, sizeId) {
+  function getMode(modeId) {
+    return typeof modeId === 'string' && has(DELIVERY_MODES, modeId) ? DELIVERY_MODES[modeId] : null;
+  }
+
+  // Devis recalculé à partir du modèle, de la taille et du mode de remise
+  // (livraison par défaut).
+  function quote(modelId, sizeId, modeId) {
     var model = getModel(modelId);
     var size = getSize(modelId, sizeId);
-    if (!model || !size) return null;
-    var shipping = typeof size.shipping === 'number' ? size.shipping : SHIPPING_EUR;
+    var mode = getMode(modeId === undefined ? DEFAULT_MODE : modeId);
+    if (!model || !size || !mode) return null;
+    var shipping = mode.free ? 0 : typeof size.shipping === 'number' ? size.shipping : SHIPPING_EUR;
     return {
       model: model,
       size: size,
+      mode: mode,
       label: size.label || model.name + ' ' + sizeLabel(size),
       price: size.price,
       shipping: shipping,
@@ -190,11 +206,15 @@
   return {
     SITE_URL: SITE_URL,
     SHIPPING_EUR: SHIPPING_EUR,
+    PICKUP_PLACE: PICKUP_PLACE,
+    DELIVERY_MODES: DELIVERY_MODES,
+    DEFAULT_MODE: DEFAULT_MODE,
     GIFTS: GIFTS,
     MODELS: MODELS,
     MODEL_IDS: MODEL_IDS,
     getModel: getModel,
     getSize: getSize,
+    getMode: getMode,
     quote: quote,
     giftsTotal: giftsTotal,
     metres: metres,

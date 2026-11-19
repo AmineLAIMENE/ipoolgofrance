@@ -161,7 +161,7 @@ test('create-payment : commande valide, prix recalculé et session Stripe confor
   assert.equal(body['line_items[1][price_data][unit_amount]'], String(catalog.SHIPPING_EUR * 100));
   assert.equal(body['line_items[1][price_data][product_data][name]'], 'Livraison en France métropolitaine');
   assert.equal(body.success_url, 'https://ipoolgofrance.fr/merci.html?session_id={CHECKOUT_SESSION_ID}');
-  assert.equal(body.cancel_url, 'https://ipoolgofrance.fr/commande.html?modele=ronde&taille=300x120');
+  assert.equal(body.cancel_url, 'https://ipoolgofrance.fr/commande.html?modele=ronde&taille=300x120&remise=livraison');
   assert.ok(!('payment_method_types[0]' in body), 'les moyens de paiement viennent du tableau de bord Stripe');
 
   assert.match(body['metadata[reference]'], /^IPG-\d{6}-[A-HJ-NP-Z2-9]{5}$/);
@@ -172,6 +172,8 @@ test('create-payment : commande valide, prix recalculé et session Stripe confor
     produit: 'Piscine iPoolGo Ronde Ø 3 m × 1,20 m',
     taille: '300x120',
     prix: '1399.00',
+    remise: 'livraison',
+    livraison: catalog.formatAmount(catalog.SHIPPING_EUR),
     total: catalog.formatAmount(TOTAL),
     nom: 'Martin',
     prenom: 'Camille',
@@ -257,6 +259,42 @@ test('create-payment : modèle ou taille inconnus refusés', async () => {
     const response = await createPayment(post(order(overrides)));
     assert.equal(response.statusCode, 400, JSON.stringify(overrides));
     assert.equal(JSON.parse(response.body).error, 'produit_inconnu');
+  }
+  assert.equal(calls.length, 0);
+});
+
+test('create-payment : retrait à Noisy-le-Grand, gratuit et sans ligne de livraison', async () => {
+  mockFetch(created);
+  const response = await createPayment(post(order({ remise: 'retrait', montant: 1399 })));
+  assert.equal(response.statusCode, 200);
+  const body = calls[0].body;
+  assert.equal(body['line_items[0][price_data][unit_amount]'], '139900');
+  assert.ok(!('line_items[1][quantity]' in body), 'pas de ligne de livraison');
+  assert.equal(body['metadata[remise]'], 'retrait');
+  assert.equal(body['metadata[livraison]'], '0.00');
+  assert.equal(body['metadata[total]'], '1399.00');
+  assert.equal(body.cancel_url, 'https://ipoolgofrance.fr/commande.html?modele=ronde&taille=300x120&remise=retrait');
+
+  // Le total avec livraison est refusé pour un retrait, et l'inverse.
+  assert.equal((await createPayment(post(order({ remise: 'retrait' })))).statusCode, 409);
+  assert.equal((await createPayment(post(order({ remise: 'livraison', montant: 1399 })))).statusCode, 409);
+  assert.equal(calls.length, 1);
+});
+
+test('create-payment : retrait possible avec une adresse hors métropole, pas la livraison', async () => {
+  mockFetch(created);
+  const client = Object.assign({}, CUSTOMER, { codePostal: '97400', ville: 'Saint-Denis' });
+  assert.equal((await createPayment(post(order({ remise: 'retrait', montant: 1399, client })))).statusCode, 200);
+  const refused = await createPayment(post(order({ client })));
+  assert.equal(refused.statusCode, 400);
+  assert.ok(JSON.parse(refused.body).champs.codePostal);
+});
+
+test('create-payment : mode de remise inconnu refusé sans appeler Stripe', async () => {
+  for (const remise of ['', 'express', null, 0, 'toString', ['retrait']]) {
+    const response = await createPayment(post(order({ remise })));
+    assert.equal(response.statusCode, 400, `remise ${JSON.stringify(remise)}`);
+    assert.equal(JSON.parse(response.body).error, 'remise_invalide');
   }
   assert.equal(calls.length, 0);
 });
@@ -411,6 +449,8 @@ test('webhook : paiement payé, vérifié chez Stripe puis deux e-mails Brevo', 
   }
   assert.ok(seller.body.htmlContent.includes(catalog.formatEUR(TOTAL)));
   assert.ok(!seller.body.htmlContent.includes('Attention'));
+  assert.ok(seller.body.htmlContent.includes('Remise : <strong>Livraison en France métropolitaine</strong>'));
+  assert.ok(!seller.body.subject.endsWith(', retrait'));
 
   assert.equal(customer.body.to[0].email, 'camille.martin@example.com');
   assert.equal(customer.body.replyTo.email, 'vendeur@example.com');
@@ -605,6 +645,42 @@ test('webhook : les champs saisis sont échappés dans les e-mails', async () =>
     assert.ok(!mail.body.htmlContent.includes('<img'));
     assert.ok(mail.body.htmlContent.includes('&lt;script&gt;'));
   }
+});
+
+test('webhook : commande à retirer, e-mails adaptés et montant sans livraison accepté', async () => {
+  const session = paidSession({ amount_total: 139900 });
+  Object.assign(session.metadata, { remise: 'retrait', livraison: '0.00', total: '1399.00' });
+  stripeAndBrevo(session);
+  await webhook(hook(stripeEvent(SESSION_ID)));
+  const [seller, customer] = brevoCalls();
+  assert.ok(!seller.body.htmlContent.includes('Attention'), 'montant conforme pour un retrait');
+  assert.match(seller.body.subject, /, retrait$/);
+  for (const expected of ['Retrait à Noisy-le-Grand', 'Adresse du client (facturation)', 'À remettre au client']) {
+    assert.ok(seller.body.htmlContent.includes(expected), `e-mail vendeur sans ${expected}`);
+  }
+  for (const expected of ['Retrait à Noisy-le-Grand', 'Gratuit', 'adresse exacte du retrait', 'à compter du retrait']) {
+    assert.ok(customer.body.htmlContent.includes(expected), `e-mail client sans ${expected}`);
+  }
+  for (const mail of [seller, customer]) {
+    assert.ok(!mail.body.htmlContent.includes('Livraison en France métropolitaine'));
+    assert.ok(!mail.body.htmlContent.includes('transporteur'));
+  }
+
+  // Un retrait facturé au prix livré (ou l'inverse) alerte le vendeur.
+  const delivered = paidSession();
+  Object.assign(delivered.metadata, { remise: 'retrait' });
+  stripeAndBrevo(delivered);
+  await webhook(hook(stripeEvent(SESSION_ID)));
+  assert.ok(brevoCalls()[0].body.htmlContent.includes('Attention'));
+});
+
+test('check-payment : le mode de remise est renvoyé à la page merci', async () => {
+  const session = paidSession({ status: 'open', payment_status: 'unpaid' });
+  stripeAndBrevo(session);
+  assert.equal(JSON.parse((await checkPayment(get(SESSION_ID))).body).commande.remise, 'livraison', 'commande ancienne : livraison');
+  session.metadata.remise = 'retrait';
+  stripeAndBrevo(session);
+  assert.equal(JSON.parse((await checkPayment(get(SESSION_ID))).body).commande.remise, 'retrait');
 });
 
 test('webhook : montant encaissé différent du catalogue, le vendeur est alerté', async () => {

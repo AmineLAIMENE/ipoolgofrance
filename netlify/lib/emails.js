@@ -26,6 +26,15 @@ function sizeText(metadata) {
   return size ? catalog.sizeLabel(size) : String(metadata.taille || '');
 }
 
+// Commandes antérieures au choix livraison / retrait : livrées.
+function isPickup(metadata) {
+  return metadata.remise === 'retrait';
+}
+
+function modeLabel(metadata) {
+  return (catalog.getMode(metadata.remise) || catalog.getMode(catalog.DEFAULT_MODE)).label;
+}
+
 function addressLines(metadata) {
   return [
     `${metadata.prenom || ''} ${metadata.nom || ''}`.trim(),
@@ -64,12 +73,12 @@ function orderTable(payment) {
   const gifts = catalog.GIFTS.map((gift) =>
     row(`${escapeHtml(gift.name)} <span style="color:#4a6168;">(valeur ${escapeHtml(euros(gift.value))})</span>`, 'Offert')
   ).join('');
-  const shipping = Number(metadata.livraison) > 0 ? escapeHtml(euros(metadata.livraison)) : 'Offerte';
+  const shipping = Number(metadata.livraison) > 0 ? escapeHtml(euros(metadata.livraison)) : isPickup(metadata) ? 'Gratuit' : 'Offerte';
   return (
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;margin:8px 0 20px;">' +
     row(escapeHtml(metadata.produit), escapeHtml(euros(metadata.prix))) +
     gifts +
-    row('Livraison en France métropolitaine', shipping) +
+    row(escapeHtml(modeLabel(metadata)), shipping) +
     row('Total payé TTC', escapeHtml(euros(payment.amount.value)), true) +
     '</table>'
   );
@@ -78,7 +87,7 @@ function orderTable(payment) {
 // Le montant encaissé doit correspondre au catalogue actuel ; sinon le vendeur est prévenu.
 function amountWarning(payment) {
   const metadata = payment.metadata || {};
-  const quote = catalog.quote(metadata.modele, metadata.taille);
+  const quote = catalog.quote(metadata.modele, metadata.taille, metadata.remise || catalog.DEFAULT_MODE);
   const paid = Math.round(Number(payment.amount && payment.amount.value) * 100);
   const euro = Boolean(payment.amount) && payment.amount.currency === 'EUR';
   if (quote && euro && paid === Math.round(quote.total * 100)) return '';
@@ -91,6 +100,9 @@ function sellerEmail(payment, env) {
   const address = addressLines(metadata);
   const warning = amountWarning(payment);
   const total = euros(payment.amount.value);
+  const pickup = isPickup(metadata);
+  const pickupNote = `Retrait à ${catalog.PICKUP_PLACE} : contacter le client pour fixer le jour et lui donner l’adresse exacte.`;
+  const addressTitle = pickup ? 'Adresse du client (facturation)' : 'Adresse de livraison (prête à copier)';
 
   const html = layout(
     'Nouvelle commande payée',
@@ -101,14 +113,16 @@ function sellerEmail(payment, env) {
       `<p style="margin:0 0 4px;">Session Stripe : ${escapeHtml(payment.id)}</p>`,
       `<p style="margin:0 0 4px;">Modèle : <strong>${escapeHtml(metadata.produit)}</strong></p>`,
       `<p style="margin:0 0 4px;">Taille : <strong>${escapeHtml(sizeText(metadata))}</strong></p>`,
-      `<p style="margin:0 0 16px;">Montant encaissé : <strong>${escapeHtml(total)}</strong></p>`,
+      `<p style="margin:0 0 4px;">Montant encaissé : <strong>${escapeHtml(total)}</strong></p>`,
+      `<p style="margin:0 0 16px;">Remise : <strong>${escapeHtml(modeLabel(metadata))}</strong></p>`,
+      pickup ? `<p style="padding:12px;background:#fff4d6;border-radius:8px;">${escapeHtml(pickupNote)}</p>` : '',
       orderTable(payment),
-      '<h2 style="margin:0 0 8px;font-size:17px;color:#005f73;">Adresse de livraison (prête à copier)</h2>',
+      `<h2 style="margin:0 0 8px;font-size:17px;color:#005f73;">${escapeHtml(addressTitle)}</h2>`,
       `<pre style="margin:0 0 20px;padding:14px;background:#eef7f7;border-radius:8px;font-family:Consolas,Menlo,monospace;font-size:15px;line-height:1.5;white-space:pre-wrap;">${escapeHtml(address.join('\n'))}</pre>`,
       '<h2 style="margin:0 0 8px;font-size:17px;color:#005f73;">Contact client</h2>',
       `<p style="margin:0 0 4px;">E-mail : ${escapeHtml(metadata.email)}</p>`,
       `<p style="margin:0 0 16px;">Téléphone : ${escapeHtml(metadata.telephone)}</p>`,
-      '<p style="margin:0;color:#4a6168;">À joindre au colis : la pompe de gonflage électrique et le système de filtration à sable offerts.</p>'
+      `<p style="margin:0;color:#4a6168;">${pickup ? 'À remettre au client' : 'À joindre au colis'} : la pompe de gonflage électrique et le système de filtration à sable offerts.</p>`
     ].join('')
   );
 
@@ -120,21 +134,23 @@ function sellerEmail(payment, env) {
     `Modèle : ${metadata.produit}`,
     `Taille : ${sizeText(metadata)}`,
     `Montant encaissé : ${total}`,
+    `Remise : ${modeLabel(metadata)}`,
+    pickup ? pickupNote : '',
     '',
-    'Adresse de livraison :',
+    `${pickup ? 'Adresse du client (facturation)' : 'Adresse de livraison'} :`,
     address.join('\n'),
     '',
     `E-mail : ${metadata.email}`,
     `Téléphone : ${metadata.telephone}`,
     '',
-    'À joindre au colis : pompe de gonflage électrique et système de filtration à sable offerts.'
+    `${pickup ? 'À remettre au client' : 'À joindre au colis'} : pompe de gonflage électrique et système de filtration à sable offerts.`
   ].filter((line) => line !== '').join('\n');
 
   return {
     sender: { name: 'Boutique iPoolGo France', email: env.SENDER_EMAIL },
     to: [{ email: env.SELLER_EMAIL }],
     replyTo: { email: metadata.email, name: address[0] },
-    subject: `[iPoolGoFrance.fr] Nouvelle commande iPoolGo France payée : ${metadata.produit} (${total})`,
+    subject: `[iPoolGoFrance.fr] Nouvelle commande iPoolGo France payée : ${metadata.produit} (${total})${pickup ? ', retrait' : ''}`,
     htmlContent: html,
     textContent: text,
     tags: ['commande-vendeur']
@@ -145,6 +161,17 @@ function customerEmail(payment, env) {
   const metadata = payment.metadata || {};
   const address = addressLines(metadata);
   const site = siteUrl();
+  const pickup = isPickup(metadata);
+  const next = pickup
+    ? [
+        `Votre piscine vous attend à ${catalog.PICKUP_PLACE} (Île-de-France). Nous vous appelons au ${metadata.telephone} ou vous écrivons sous 2 jours ouvrés pour convenir d’un créneau et vous donner l’adresse exacte du retrait.`,
+        'Prévoyez un véhicule assez grand pour les cartons. Contrôlez-les avec nous au moment du retrait.'
+      ]
+    : [
+        `Nous préparons votre colis en France. Le transporteur vous appelle au ${metadata.telephone} pour fixer le jour de livraison. Comptez 5 à 10 jours ouvrés pour un modèle en stock. Si votre taille demande plus de temps, nous vous écrivons avant l’expédition.`,
+        'Le jour de la livraison, contrôlez les colis avant de signer. Si un carton est abîmé, notez-le sur le bon du transporteur et écrivez-nous dans les 48 heures.'
+      ];
+  const start = pickup ? 'du retrait' : 'de la livraison';
 
   const html = layout(
     'Votre commande est confirmée',
@@ -152,13 +179,13 @@ function customerEmail(payment, env) {
       `<h1 style="margin:0 0 16px;font-size:22px;color:#005f73;">Merci ${escapeHtml(metadata.prenom)}, votre commande est confirmée</h1>`,
       `<p style="margin:0 0 16px;">Nous avons bien reçu votre paiement. Votre référence de commande est <strong>${escapeHtml(reference(payment))}</strong>. Gardez cet e-mail, il vous servira pour toute demande.</p>`,
       orderTable(payment),
-      '<h2 style="margin:0 0 8px;font-size:17px;color:#005f73;">Adresse de livraison</h2>',
+      `<h2 style="margin:0 0 8px;font-size:17px;color:#005f73;">${pickup ? 'Vos coordonnées' : 'Adresse de livraison'}</h2>`,
       `<p style="margin:0 0 20px;">${address.map(escapeHtml).join('<br>')}</p>`,
       '<h2 style="margin:0 0 8px;font-size:17px;color:#005f73;">La suite</h2>',
-      `<p style="margin:0 0 12px;">Nous préparons votre colis en France. Le transporteur vous appelle au ${escapeHtml(metadata.telephone)} pour fixer le jour de livraison. Comptez 5 à 10 jours ouvrés pour un modèle en stock. Si votre taille demande plus de temps, nous vous écrivons avant l’expédition.</p>`,
-      '<p style="margin:0 0 20px;">Le jour de la livraison, contrôlez les colis avant de signer. Si un carton est abîmé, notez-le sur le bon du transporteur et écrivez-nous dans les 48 heures.</p>',
+      `<p style="margin:0 0 12px;">${escapeHtml(next[0])}</p>`,
+      `<p style="margin:0 0 20px;">${escapeHtml(next[1])}</p>`,
       '<h2 style="margin:0 0 8px;font-size:17px;color:#005f73;">Garantie et rétractation</h2>',
-      `<p style="margin:0 0 20px;">Votre piscine est vendue par SAS Virage. Elle bénéficie de la garantie légale de conformité de 2 ans et de la garantie des vices cachés. Vous avez 14 jours à compter de la livraison pour vous rétracter. Le détail figure dans nos <a href="${site}/cgv.html" style="color:#005f73;">Conditions Générales de Vente</a>.</p>`,
+      `<p style="margin:0 0 20px;">Votre piscine est vendue par SAS Virage. Elle bénéficie de la garantie légale de conformité de 2 ans et de la garantie des vices cachés. Vous avez 14 jours à compter ${start} pour vous rétracter. Le détail figure dans nos <a href="${site}/cgv.html" style="color:#005f73;">Conditions Générales de Vente</a>.</p>`,
       '<h2 style="margin:0 0 8px;font-size:17px;color:#005f73;">Une question ?</h2>',
       `<p style="margin:0;">Le service après-vente répond par e-mail à <a href="mailto:${SUPPORT_EMAIL}" style="color:#005f73;">${SUPPORT_EMAIL}</a> ou par téléphone au ${SUPPORT_PHONE}. Indiquez votre référence de commande.</p>`
     ].join('')
@@ -171,14 +198,14 @@ function customerEmail(payment, env) {
     '',
     `${metadata.produit} : ${euros(metadata.prix)}`,
     gifts.join('\n'),
-    `Livraison en France métropolitaine : ${Number(metadata.livraison) > 0 ? euros(metadata.livraison) : 'offerte'}`,
+    `${modeLabel(metadata)} : ${Number(metadata.livraison) > 0 ? euros(metadata.livraison) : pickup ? 'gratuit' : 'offerte'}`,
     `Total payé TTC : ${euros(payment.amount.value)}`,
     '',
-    'Adresse de livraison :',
+    `${pickup ? 'Vos coordonnées' : 'Adresse de livraison'} :`,
     address.join('\n'),
     '',
-    'Le transporteur vous appelle pour fixer le jour de livraison. Comptez 5 à 10 jours ouvrés pour un modèle en stock.',
-    'Garantie légale de conformité de 2 ans, garantie des vices cachés, rétractation sous 14 jours après livraison.',
+    next[0],
+    'Garantie légale de conformité de 2 ans, garantie des vices cachés, rétractation sous 14 jours après ' + (pickup ? 'le retrait.' : 'la livraison.'),
     `Conditions Générales de Vente : ${site}/cgv.html`,
     '',
     `Service après-vente : ${SUPPORT_EMAIL} ou ${SUPPORT_PHONE}`,
