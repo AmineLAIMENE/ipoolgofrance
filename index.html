@@ -28,7 +28,8 @@
 <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/instrument-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" as="image" href="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-880.webp" imagesrcset="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-560.webp 560w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-720.webp 720w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-880.webp 880w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-1050.webp 1050w" imagesizes="(min-width: 60rem) 55vw, calc(100vw - 2.5rem)" fetchpriority="high">
+<link rel="preload" as="image" media="(max-width: 59.99rem)" href="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-720.webp" imagesrcset="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-560.webp 560w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-720.webp 720w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-880.webp 880w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-1050.webp 1050w" imagesizes="100vw" fetchpriority="high">
+<link rel="preload" as="image" media="(min-width: 60rem)" href="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-large-1300.webp" imagesrcset="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-large-960.webp 960w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-large-1300.webp 1300w" imagesizes="100vw" fetchpriority="high">
 <link rel="stylesheet" href="/assets/css/style.css">
 <script src="/assets/js/catalog.js" defer></script>
 <script src="/assets/js/app.js" defer></script>
@@ -53,37 +54,43 @@
       <img src="/assets/images/logo-ipoolgo.webp" alt="iPoolGo" width="132" height="22">
       <span>France</span>
     </a>
-    <nav class="menu" aria-label="Navigation principale">
+    <nav class="menu" id="menu-principal" aria-label="Navigation principale">
       <ul>
         <li><a href="/piscine-ronde-ipoolgo.html">Piscine ronde</a></li>
         <li><a href="/piscine-rectangulaire-ipoolgo.html">Piscine rectangulaire</a></li>
         <li><a href="/comparatif-piscine-ipoolgo.html">Comparatif</a></li>
         <li><a href="/#avis">Avis</a></li>
+        <li class="menu__tel"><a href="tel:+33780806764">Une question&#8239;? 07 80 80 67 64</a></li>
       </ul>
     </nav>
     <a class="bouton bouton--petit" href="/commande.html">Commander</a>
+    <button class="menu-bouton" type="button" aria-expanded="false" aria-controls="menu-principal">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="menu-bouton__haut" d="M4 7h16"/><path class="menu-bouton__milieu" d="M4 12h16"/><path class="menu-bouton__bas" d="M4 17h16"/></svg>
+      <span>Menu</span>
+    </button>
   </div>
 </header>
 <main id="contenu">
 <section class="hero">
+  <picture class="hero__photo">
+    <source media="(min-width: 60rem)" srcset="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-large-960.webp 960w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-large-1300.webp 1300w" sizes="100vw" width="1300" height="768">
+    <img src="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-720.webp" srcset="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-560.webp 560w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-720.webp 720w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-880.webp 880w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-1050.webp 1050w" sizes="100vw" alt="Piscine gonflable rigide iPoolGo ronde installée sur la terrasse d’une maison, à côté du salon de jardin" width="1050" height="700" fetchpriority="high" decoding="async">
+  </picture>
   <div class="conteneur hero__grille">
     <div class="hero__texte">
-      <h1>iPoolGo, la piscine gonflable rigide en Drop-Stitch</h1>
-      <p class="chapo">iPoolGo est une marque de piscines hors-sol aux parois gonflées à haute pression, rigides sans armature métallique. La pompe de gonflage et la filtration à sable sont offertes (valeur <span data-catalog="cadeaux">440&nbsp;€</span>). Dès <span data-catalog="ronde.min">999&nbsp;€</span>, expédiée depuis la France par SAS Virage, revendeur officiel iPoolGo.</p>
+      <h1>La piscine gonflable rigide, debout en 30&nbsp;minutes</h1>
+      <p class="chapo">Des parois Drop-Stitch gonflées à haute pression, sans armature métallique. Pompe de gonflage et filtration à sable offertes (<span data-catalog="cadeaux">440&nbsp;€</span>), dès <span data-catalog="ronde.min">999&nbsp;€</span>. Vendue et expédiée depuis la France par SAS Virage, revendeur officiel iPoolGo.</p>
       <div class="hero__actions">
         <a class="bouton bouton--large" href="/commande.html">Choisir ma piscine</a>
         <a class="lien-fleche" href="#modeles">Voir les deux modèles</a>
       </div>
       <p class="hero__preuve"><svg class="etoiles" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg> <span>5/5 sur 4 notes, <a href="#avis">15 avis d’acheteurs</a></span></p>
     </div>
-    <div class="hero__visuel">
-      <img src="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-720.webp" srcset="/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-560.webp 560w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-720.webp 720w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-880.webp 880w, /assets/images/piscine-gonflable-rigide-ipoolgo-ronde-terrasse-1050.webp 1050w" sizes="(min-width: 60rem) 55vw, calc(100vw - 2.5rem)" alt="Piscine gonflable rigide iPoolGo ronde installée sur la terrasse d’une maison, à côté du salon de jardin" width="1050" height="700" fetchpriority="high" decoding="async">
-      <p class="offre">
-        <span class="offre__valeur"><span data-catalog="cadeaux">440&nbsp;€</span></span>
-        <strong class="offre__titre">Pompe et filtration offertes</strong>
-        <span class="offre__detail">Valeur de la pompe de gonflage électrique et de la filtration à sable livrées avec chaque piscine</span>
-      </p>
-    </div>
+    <p class="offre">
+      <span class="offre__valeur"><span data-catalog="cadeaux">440&nbsp;€</span></span>
+      <strong class="offre__titre">Pompe et filtration offertes</strong>
+      <span class="offre__detail">Livrées avec chaque piscine, quelle que soit la taille</span>
+    </p>
   </div>
 </section>
 
@@ -136,6 +143,112 @@
         </div>
       </article>
     </div>
+  </div>
+</section>
+
+<section class="section section--eau" id="colis">
+  <div class="conteneur">
+    <div class="section__tete">
+      <h2>Ce que vous recevez</h2>
+      <p>Chaque piscine est livrée avec sa pompe de gonflage et sa filtration à sable. Vendues <span data-catalog="cadeaux">440&nbsp;€</span> à elles deux, elles sont offertes avec toutes les tailles.</p>
+    </div>
+    <div class="colis">
+      <div class="colis__item">
+        <img src="/assets/images/piscine-ronde-ipoolgo-emerald-grey-480.webp" alt="Piscine iPoolGo ronde coloris Emerald Grey" width="480" height="480" loading="lazy" decoding="async">
+        <div>
+          <h3>Votre piscine iPoolGo</h3>
+          <p>Ronde ou Rectangulaire, dans la taille choisie, avec son kit de réparation (rustines PVC et colle).</p>
+          <span class="colis__prix">dès <span data-catalog="ronde.min">999&nbsp;€</span></span>
+        </div>
+      </div>
+      <div class="colis__item colis__item--offert">
+        <img src="/assets/images/pompe-gonflage-electrique-ipoolgo-480.webp" alt="Pompe de gonflage électrique à batterie offerte avec la piscine iPoolGo" width="480" height="480" loading="lazy" decoding="async">
+        <div>
+          <h3>Pompe de gonflage électrique</h3>
+          <p>Sur batterie (6&#8239;000&nbsp;mAh, 11,1&nbsp;V), elle gonfle la piscine sans rallonge jusqu’au fond du jardin.</p>
+          <span class="colis__prix"><s><span data-catalog="pompe">150&nbsp;€</span></s> Offerte</span>
+        </div>
+      </div>
+      <div class="colis__item colis__item--offert">
+        <img src="/assets/images/filtration-sable-ipoolgo-480.webp" alt="Système de filtration à sable offert avec la piscine iPoolGo" width="480" height="480" loading="lazy" decoding="async">
+        <div>
+          <h3>Filtration à sable</h3>
+          <p>Débit de 8&#8239;705&nbsp;L/h, moteur de 90&nbsp;W, cuve de 8&nbsp;kg de sable et tuyaux de 32&nbsp;mm.</p>
+          <span class="colis__prix"><s><span data-catalog="filtration">290&nbsp;€</span></s> Offerte</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--lagon" id="installation">
+  <div class="conteneur duo">
+    <div class="section__tete">
+      <h2>Combien de temps pour installer une piscine iPoolGo&#8239;?</h2>
+      <p>Le gonflage prend moins d’une demi-heure. Le remplissage se fait ensuite au tuyau d’arrosage, à environ 1&#8239;000&nbsp;L par heure&nbsp;: 7 à 8 heures pour une Ronde Ø&nbsp;3&nbsp;m&nbsp;×&nbsp;1,20&nbsp;m, plus d’une journée pour les plus grands bassins.</p>
+    </div>
+    <ol class="etapes">
+      <li>
+        <h3>Préparez le sol</h3>
+        <p>Pelouse, béton, dallage ou gravier compacté. Il doit être plat, de niveau et sans cailloux.</p>
+      </li>
+      <li>
+        <h3>Déroulez la piscine</h3>
+        <p>Dépliez-la à son emplacement définitif. Une fois pleine, elle ne se déplace plus.</p>
+      </li>
+      <li>
+        <h3>Gonflez les parois <span class="duree">20 à 30&nbsp;min</span></h3>
+        <p>La pompe électrique fournie amène les parois à haute pression. La piscine tient debout toute seule.</p>
+      </li>
+      <li>
+        <h3>Branchez la filtration</h3>
+        <p>Deux tuyaux de 32&nbsp;mm relient la filtration à sable au bassin.</p>
+      </li>
+      <li>
+        <h3>Remplissez <span class="duree">7 à 8&nbsp;h pour 7&#8239;600&nbsp;L</span></h3>
+        <p>C’est le volume d’une Ronde Ø&nbsp;3&nbsp;m&nbsp;×&nbsp;1,20&nbsp;m. Réglez ensuite le pH entre 7,2 et 7,6 avant la première baignade.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="section" id="avis">
+  <div class="conteneur">
+    <div class="section__tete">
+      <h2>Ce qu’en disent les acheteurs</h2>
+    </div>
+    <p class="note-globale">
+      <span class="note-globale__valeur">5/5</span>
+      <svg class="etoiles" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg>
+      <span>sur 4 notes déposées, 15 avis d’acheteurs au total</span>
+    </p>
+    <ul class="avis-liste">
+<li class="avis avis--vedette">
+  <blockquote><p>Produit très pratique et facile à utiliser avec la pompe de gonflage fournie. La qualité est visible dès la réception. Le gonflage est rapide, environ 20 minutes et les instructions sont claires. C’est un produit fiable que je recommande.</p></blockquote>
+  <footer><strong>Cédric</strong>, Piscine iPoolGo Rectangulaire</footer>
+</li>
+<li class="avis">
+  <blockquote><p>Sans surprise avec ce produit. La conception est bien pensée et tout est simple à mettre en place. La solidité inspire confiance. Après plusieurs semaines d’utilisation, tout fonctionne très bien.</p></blockquote>
+  <footer><svg class="etoiles avis__note" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg> <strong>Diana</strong>, Piscine iPoolGo Rectangulaire</footer>
+</li>
+<li class="avis">
+  <blockquote><p>Produit fiable et efficace. La qualité est visible dès le gonflage. Tout est bien pensé pour une utilisation simple. C’est exactement ce que je recherchais.</p></blockquote>
+  <footer><svg class="etoiles avis__note" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg> <strong>Adil</strong>, Piscine iPoolGo Rectangulaire</footer>
+</li>
+<li class="avis">
+  <blockquote><p>Très bon produit qui correspond exactement à ce que je cherchais. La qualité est clairement au rendez-vous et la solidité est rassurante. L’utilisation est simple et pratique pour «&nbsp;les bambins&nbsp;». Je suis très contente de cet achat.</p></blockquote>
+  <footer><strong>Sylvie</strong>, Piscine iPoolGo Ronde</footer>
+</li>
+<li class="avis">
+  <blockquote><p>Très bon produit. La solidité est vraiment appréciable. On sent que la conception est sérieuse. Je suis très content du résultat.</p></blockquote>
+  <footer><svg class="etoiles avis__note" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg> <strong>Sophie</strong>, Piscine iPoolGo Rectangulaire</footer>
+</li>
+<li class="avis">
+  <blockquote><p>Très bonne expérience. Le produit est robuste et bien conçu. On voit que la qualité est au rendez-vous. L’équipe a aussi été très sérieuse et agréable.</p></blockquote>
+  <footer><strong>Daniel</strong>, Piscine iPoolGo Ronde</footer>
+</li>
+</ul>
+    <p class="avis-source">Avis déposés par des acheteurs sur piscineipoolgo.com, l’autre boutique de SAS Virage. Seules l’orthographe et la ponctuation ont été corrigées.</p>
   </div>
 </section>
 
@@ -233,114 +346,6 @@
       </table>
     </div>
     <p class="tableau-note">Prix des piscines autoportantes et tubulaires relevés en novembre 2026 chez les grandes enseignes françaises. <a href="/comparatif-piscine-ipoolgo.html">Lire le comparatif complet</a></p>
-  </div>
-</section>
-
-<section class="section section--eau" id="colis">
-  <div class="conteneur">
-    <div class="section__tete">
-      <h2>Ce que vous recevez</h2>
-      <p>Chaque piscine est livrée avec sa pompe de gonflage et sa filtration à sable. Vendues <span data-catalog="cadeaux">440&nbsp;€</span> à elles deux, elles sont offertes avec toutes les tailles.</p>
-    </div>
-    <div class="colis">
-      <div class="colis__item">
-        <img src="/assets/images/piscine-ronde-ipoolgo-emerald-grey-480.webp" alt="Piscine iPoolGo ronde coloris Emerald Grey" width="480" height="480" loading="lazy" decoding="async">
-        <div>
-          <h3>Votre piscine iPoolGo</h3>
-          <p>Ronde ou Rectangulaire, dans la taille choisie, avec son kit de réparation (rustines PVC et colle).</p>
-          <span class="colis__prix">dès <span data-catalog="ronde.min">999&nbsp;€</span></span>
-        </div>
-      </div>
-      <div class="colis__item colis__item--offert">
-        <img src="/assets/images/pompe-gonflage-electrique-ipoolgo-480.webp" alt="Pompe de gonflage électrique à batterie offerte avec la piscine iPoolGo" width="480" height="480" loading="lazy" decoding="async">
-        <div>
-          <h3>Pompe de gonflage électrique</h3>
-          <p>Sur batterie (6&#8239;000&nbsp;mAh, 11,1&nbsp;V), elle gonfle la piscine sans rallonge jusqu’au fond du jardin.</p>
-          <span class="colis__prix"><s><span data-catalog="pompe">150&nbsp;€</span></s> Offerte</span>
-        </div>
-      </div>
-      <div class="colis__item colis__item--offert">
-        <img src="/assets/images/filtration-sable-ipoolgo-480.webp" alt="Système de filtration à sable offert avec la piscine iPoolGo" width="480" height="480" loading="lazy" decoding="async">
-        <div>
-          <h3>Filtration à sable</h3>
-          <p>Débit de 8&#8239;705&nbsp;L/h, moteur de 90&nbsp;W, cuve de 8&nbsp;kg de sable et tuyaux de 32&nbsp;mm.</p>
-          <span class="colis__prix"><s><span data-catalog="filtration">290&nbsp;€</span></s> Offerte</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section section--lagon" id="installation">
-  <div class="conteneur duo">
-    <div class="section__tete">
-      <h2>Combien de temps pour installer une piscine iPoolGo&#8239;?</h2>
-      <p>Le gonflage prend moins d’une demi-heure. Le remplissage se fait ensuite au tuyau d’arrosage, à environ 1&#8239;000&nbsp;L par heure&nbsp;: 7 à 8 heures pour une Ronde Ø&nbsp;3&nbsp;m&nbsp;×&nbsp;1,20&nbsp;m, plus d’une journée pour les plus grands bassins.</p>
-    </div>
-    <ol class="etapes">
-      <li>
-        <h3>Préparez le sol</h3>
-        <p>Pelouse, béton, dallage ou gravier compacté. Il doit être plat, de niveau et sans cailloux.</p>
-      </li>
-      <li>
-        <h3>Déroulez la piscine</h3>
-        <p>Dépliez-la à son emplacement définitif. Une fois pleine, elle ne se déplace plus.</p>
-      </li>
-      <li>
-        <h3>Gonflez les parois <span class="duree">20 à 30&nbsp;min</span></h3>
-        <p>La pompe électrique fournie amène les parois à haute pression. La piscine tient debout toute seule.</p>
-      </li>
-      <li>
-        <h3>Branchez la filtration</h3>
-        <p>Deux tuyaux de 32&nbsp;mm relient la filtration à sable au bassin.</p>
-      </li>
-      <li>
-        <h3>Remplissez <span class="duree">7 à 8&nbsp;h pour 7&#8239;600&nbsp;L</span></h3>
-        <p>C’est le volume d’une Ronde Ø&nbsp;3&nbsp;m&nbsp;×&nbsp;1,20&nbsp;m. Réglez ensuite le pH entre 7,2 et 7,6 avant la première baignade.</p>
-      </li>
-    </ol>
-  </div>
-</section>
-
-<section class="section" id="avis">
-  <div class="conteneur">
-    <div class="section__tete">
-      <h2>Ce qu’en disent les acheteurs</h2>
-    </div>
-    <p class="note-globale">
-      <span class="note-globale__valeur">5/5</span>
-      <svg class="etoiles" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg>
-      <span>sur 4 notes déposées, 15 avis d’acheteurs au total</span>
-    </p>
-    <ul class="avis-liste">
-<li class="avis">
-  <svg class="etoiles" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg>
-  <blockquote><p>Sans surprise avec ce produit. La conception est bien pensée et tout est simple à mettre en place. La solidité inspire confiance. Après plusieurs semaines d’utilisation, tout fonctionne très bien.</p></blockquote>
-  <footer><strong>Diana</strong>, Piscine iPoolGo Rectangulaire</footer>
-</li>
-<li class="avis">
-  <blockquote><p>Produit très pratique et facile à utiliser avec la pompe de gonflage fourni. La qualité est visible dès la réception. Le gonflage est rapide environ 20 minutes et les instructions sont claires. C’est un produit fiable que je recommande.❤️</p></blockquote>
-  <footer><strong>cedric</strong>, Piscine iPoolGo Rectangulaire</footer>
-</li>
-<li class="avis">
-  <svg class="etoiles" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg>
-  <blockquote><p>Produit fiable et efficace. La qualité est visible dès le gonflage. Tout est bien pensé pour une utilisation simple. C’est exactement ce que je recherchais.</p></blockquote>
-  <footer><strong>Adil</strong>, Piscine iPoolGo Rectangulaire</footer>
-</li>
-<li class="avis">
-  <blockquote><p>Très bon produit qui correspond exactement à ce que je cherchais. La qualité est clairement au rendez-vous et la solidité est rassurante. L’utilisation est simple et pratique pour «&nbsp;les bambins&nbsp;». Je suis très contente de cet achat. 👌</p></blockquote>
-  <footer><strong>Sylvie</strong>, Piscine iPoolGo Ronde</footer>
-</li>
-<li class="avis">
-  <svg class="etoiles" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg>
-  <blockquote><p>Très bon produit. La solidité est vraiment appréciable. On sent que la conception est sérieuse. Je suis très content du résultat.</p></blockquote>
-  <footer><strong>Sophie</strong>, Piscine iPoolGo Rectangulaire</footer>
-</li>
-<li class="avis">
-  <blockquote><p>Très bonne expérience. Le produit est robuste et bien conçu. On voit que la qualité est au rendez-vous. L’équipe a aussi été très sérieuse et agréable.</p></blockquote>
-  <footer><strong>Daniel</strong>, Piscine iPoolGo Ronde</footer>
-</li>
-</ul>
   </div>
 </section>
 

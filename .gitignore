@@ -18,3 +18,6 @@ tmp/
 Thumbs.db
 .idea/
 .vscode/
+
+# Rapports Impeccable (critique locale).
+.impeccable/

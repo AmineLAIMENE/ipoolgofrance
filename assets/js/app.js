@@ -652,10 +652,46 @@
     check();
   }
 
+  // ------------------------------------------------------------------ menu mobile
+
+  function initMenu() {
+    var button = $('.menu-bouton');
+    var menu = button && document.getElementById(button.getAttribute('aria-controls'));
+    if (!menu) return;
+    var label = $('span', button);
+
+    function toggle(open) {
+      button.setAttribute('aria-expanded', open ? 'true' : 'false');
+      label.textContent = open ? 'Fermer' : 'Menu';
+      if (open) menu.setAttribute('data-ouvert', '');
+      else menu.removeAttribute('data-ouvert');
+    }
+
+    button.addEventListener('click', function () {
+      var open = button.getAttribute('aria-expanded') !== 'true';
+      toggle(open);
+      if (open) $('a', menu).focus();
+    });
+    // Un lien d'ancre (#avis) ou la touche Échap referment le panneau.
+    menu.addEventListener('click', function (event) {
+      if (event.target.closest('a')) toggle(false);
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+        toggle(false);
+        button.focus();
+      }
+    });
+    document.addEventListener('click', function (event) {
+      if (button.getAttribute('aria-expanded') === 'true' && !event.target.closest('.entete')) toggle(false);
+    });
+  }
+
   // ------------------------------------------------------------------ démarrage
 
   function init() {
     initCookies();
+    initMenu();
     if (!catalog) return;
 
     $all('[data-config]').forEach(function (root) {

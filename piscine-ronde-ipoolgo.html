@@ -54,15 +54,20 @@
       <img src="/assets/images/logo-ipoolgo.webp" alt="iPoolGo" width="132" height="22">
       <span>France</span>
     </a>
-    <nav class="menu" aria-label="Navigation principale">
+    <nav class="menu" id="menu-principal" aria-label="Navigation principale">
       <ul>
         <li><a href="/piscine-ronde-ipoolgo.html" aria-current="page">Piscine ronde</a></li>
         <li><a href="/piscine-rectangulaire-ipoolgo.html">Piscine rectangulaire</a></li>
         <li><a href="/comparatif-piscine-ipoolgo.html">Comparatif</a></li>
         <li><a href="/#avis">Avis</a></li>
+        <li class="menu__tel"><a href="tel:+33780806764">Une question&#8239;? 07 80 80 67 64</a></li>
       </ul>
     </nav>
     <a class="bouton bouton--petit" href="/commande.html?modele=ronde&amp;taille=300x120" data-commander>Commander</a>
+    <button class="menu-bouton" type="button" aria-expanded="false" aria-controls="menu-principal">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="menu-bouton__haut" d="M4 7h16"/><path class="menu-bouton__milieu" d="M4 12h16"/><path class="menu-bouton__bas" d="M4 17h16"/></svg>
+      <span>Menu</span>
+    </button>
   </div>
 </header>
 <main id="contenu">
@@ -100,7 +105,10 @@
       </div>
     </fieldset>
 
-    <p class="produit__action"><a class="bouton bouton--large" data-commander href="/commande.html?modele=ronde&amp;taille=300x120">Commander cette taille</a></p>
+    <p class="produit__action">
+      <span class="produit__total"><span data-out="taille">Ø&nbsp;3&nbsp;m&nbsp;×&nbsp;1,20&nbsp;m</span> <strong><span data-out="total" data-catalog="ronde.300x120.total">1&#8239;759&nbsp;€</span> <small>livrée</small></strong></span>
+      <a class="bouton" data-commander href="/commande.html?modele=ronde&amp;taille=300x120">Commander</a>
+    </p>
 
     <div class="recap">
       <p class="recap__titre" data-out="taille">Ø&nbsp;3&nbsp;m&nbsp;×&nbsp;1,20&nbsp;m</p>
@@ -119,11 +127,10 @@
       <p class="recap__note" data-out="urbanisme"></p>
     </div>
 
-    <p class="produit__action"><a class="bouton bouton--large bouton--contour" data-commander href="/commande.html?modele=ronde&amp;taille=300x120">Commander cette taille</a></p>
 
     <ul class="garanties">
       <li>Vendue et expédiée depuis la France par SAS Virage, revendeur officiel iPoolGo</li>
-      <li>Livrée sous 5 à 10 jours ouvrés si elle est en stock</li>
+      <li>Livrée sous 5 à 10 jours ouvrés, toutes tailles disponibles</li>
       <li>14 jours pour vous rétracter après la livraison</li>
       <li>Garantie légale de conformité de 2 ans</li>
       <li>Paiement par carte sur la page sécurisée de Stripe</li>
@@ -272,19 +279,19 @@
     </p>
     <ul class="avis-liste">
 <li class="avis">
-  <blockquote><p>Produit vraiment solide et bien conçu. On sent que la fabrication est sérieuse et faite pour durer dans le temps. Le gonflage est simple et rapide. Une fois en place, out fonctionne parfaitement.</p></blockquote>
-  <footer><strong>kevin</strong></footer>
+  <blockquote><p>Produit vraiment solide et bien conçu. On sent que la fabrication est sérieuse et faite pour durer dans le temps. Le gonflage est simple et rapide. Une fois en place, tout fonctionne parfaitement.</p></blockquote>
+  <footer><strong>Kevin</strong></footer>
 </li>
 <li class="avis">
-  <blockquote><p>Très bon produit qui correspond exactement à ce que je cherchais. La qualité est clairement au rendez-vous et la solidité est rassurante. L’utilisation est simple et pratique pour «&nbsp;les bambins&nbsp;». Je suis très contente de cet achat. 👌</p></blockquote>
+  <blockquote><p>Très bon produit qui correspond exactement à ce que je cherchais. La qualité est clairement au rendez-vous et la solidité est rassurante. L’utilisation est simple et pratique pour «&nbsp;les bambins&nbsp;». Je suis très contente de cet achat.</p></blockquote>
   <footer><strong>Sylvie</strong></footer>
 </li>
 <li class="avis">
-  <blockquote><p>Produit robuste et fiable. Dès le gonflage on remarque que la piscine est de tres bonne qualité. Elle gonfle rapidement&#8239;! bravo je recommande</p></blockquote>
-  <footer><strong>laure</strong></footer>
+  <blockquote><p>Produit robuste et fiable. Dès le gonflage on remarque que la piscine est de très bonne qualité. Elle gonfle rapidement&#8239;! Bravo, je recommande.</p></blockquote>
+  <footer><strong>Laure</strong></footer>
 </li>
 <li class="avis">
-  <blockquote><p>Très bonne surprise avec cet piscine. La conception est bien pensée et tout est simple à mettre en place. La solidité inspire confiance. je recommande 🤗</p></blockquote>
+  <blockquote><p>Très bonne surprise avec cette piscine. La conception est bien pensée et tout est simple à mettre en place. La solidité inspire confiance. Je recommande.</p></blockquote>
   <footer><strong>James</strong></footer>
 </li>
 <li class="avis">
@@ -296,11 +303,11 @@
   <footer><strong>Jacques</strong></footer>
 </li>
 <li class="avis">
-  <svg class="etoiles" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg>
   <blockquote><p>Produit très pratique et facile à utiliser. La qualité est visible dès la réception. Le montage est rapide et les instructions sont claires. C’est un produit fiable que je recommande.</p></blockquote>
-  <footer><strong>Patrice</strong></footer>
+  <footer><svg class="etoiles avis__note" viewBox="0 0 100 20" role="img" aria-label="5 sur 5"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(0)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(20)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(40)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(60)"/><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" transform="translate(80)"/></svg> <strong>Patrice</strong></footer>
 </li>
 </ul>
+    <p class="avis-source">Avis déposés par des acheteurs sur piscineipoolgo.com, l’autre boutique de SAS Virage. Seules l’orthographe et la ponctuation ont été corrigées.</p>
   </div>
 </section>
 

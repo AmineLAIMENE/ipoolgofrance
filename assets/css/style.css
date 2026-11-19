@@ -21,6 +21,7 @@
   --lagon: #005f73;
   --lagon-clair: #0a9396;
   --encre: #0b2a33;
+  --abysse: #032129;
   --encre-douce: #48626a;
   --eau: #eef7f7;
   --trait: #c9dfdf;
@@ -52,6 +53,10 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
+}
+
+html {
+  scroll-padding-top: 5rem;
 }
 
 @media (min-width: 56rem) {
@@ -120,6 +125,11 @@ table {
 
 p + p {
   margin-top: 1em;
+}
+
+/* Lignes de 70 caractères au plus pour le texte courant. */
+main p {
+  max-width: 72ch;
 }
 
 a {
@@ -300,23 +310,28 @@ strong {
 /* ------------------------------------------------------------ en-tête */
 
 .entete {
-  background: var(--blanc);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgb(255 255 255 / 94%);
   border-bottom: 1px solid var(--trait);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  backdrop-filter: saturate(1.4) blur(10px);
 }
 
 .entete__barre {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem 0.75rem;
-  padding-block: 0.75rem;
+  min-height: 4rem;
 }
 
 .marque {
   display: inline-flex;
   align-items: baseline;
   gap: 0.5rem;
+  margin-right: auto;
   padding-block: 0.6rem;
   color: var(--lagon);
   font-family: var(--titre);
@@ -336,43 +351,18 @@ strong {
   }
 }
 
-.menu {
-  order: 3;
-  flex: 1 0 100%;
-  margin-inline: calc(-1 * var(--marge));
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
 .menu ul {
-  display: flex;
-  gap: 0.25rem;
   margin: 0;
-  padding: 0 calc(var(--marge) - 0.6rem);
+  padding: 0;
   list-style: none;
-  white-space: nowrap;
 }
 
 .menu a {
   display: block;
-  padding: 0.55rem 0.6rem;
   color: var(--encre);
   font-weight: 550;
   text-decoration: none;
   border-radius: var(--rayon-petit);
-}
-
-/* Sur mobile, le menu défile : le fondu à droite signale les liens masqués. */
-@media (max-width: 55.99rem) {
-  .menu {
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent);
-    mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent);
-  }
-
-  .menu ul {
-    width: max-content;
-    padding-right: 3rem;
-  }
 }
 
 .menu a:hover,
@@ -383,43 +373,221 @@ strong {
   text-underline-offset: 0.4em;
 }
 
-@media (min-width: 56rem) {
-  .entete {
-    position: sticky;
-    top: 0;
-    z-index: 30;
+.menu-bouton {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  margin-right: -0.5rem;
+  padding: 0 0.5rem;
+  border: 0;
+  background: none;
+  color: var(--encre);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--rayon-petit);
+}
+
+.menu-bouton svg {
+  flex: none;
+  max-width: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.menu-bouton path {
+  transform-origin: 12px 12px;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s;
+}
+
+.menu-bouton[aria-expanded="true"] .menu-bouton__haut {
+  transform: translateY(5px) rotate(45deg);
+}
+
+.menu-bouton[aria-expanded="true"] .menu-bouton__milieu {
+  opacity: 0;
+}
+
+.menu-bouton[aria-expanded="true"] .menu-bouton__bas {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
+/* Mobile : un bouton Menu ouvre un panneau sous l'en-tête. Sans JavaScript,
+   les liens restent sur une ligne qui défile. */
+@media (max-width: 55.99rem) {
+  .entete__barre {
+    flex-wrap: wrap;
   }
 
   .menu {
-    order: 0;
-    flex: 0 1 auto;
-    margin-inline: auto 0;
-    overflow: visible;
+    order: 3;
+    flex: 1 0 100%;
+    margin-inline: calc(-1 * var(--marge));
+    overflow-x: auto;
+    scrollbar-width: none;
   }
 
   .menu ul {
-    gap: 0.5rem;
+    display: flex;
+    width: max-content;
+    padding: 0 calc(var(--marge) - 0.6rem);
+    white-space: nowrap;
+  }
+
+  .menu a {
+    padding: 0.7rem 0.6rem;
+  }
+
+  .menu__tel {
+    display: none;
+  }
+
+  .entete .bouton--petit {
+    min-height: 2.75rem;
+    padding-inline: 0.9rem;
+  }
+
+  .marque img {
+    width: clamp(96px, 26vw, 132px);
+  }
+}
+
+/* Petits écrans : le bouton Menu ne garde que son icône (le texte reste lu). */
+@media (max-width: 26rem) {
+  .menu-bouton span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 55.99rem) and (scripting: enabled) {
+  .entete__barre {
+    flex-wrap: nowrap;
+  }
+
+  .menu-bouton {
+    display: inline-flex;
+  }
+
+  .menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    margin: 0 calc(-1 * var(--marge));
+    padding: 0.5rem var(--marge) 1.25rem;
+    overflow: visible;
+    background: var(--blanc);
+    border-bottom: 1px solid var(--trait);
+    box-shadow: 0 24px 32px -24px rgb(11 42 51 / 35%);
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-0.5rem);
+    transition: opacity 0.2s, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s 0.25s;
+  }
+
+  .menu[data-ouvert] {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.2s, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .menu ul {
+    display: block;
+    width: auto;
     padding: 0;
+  }
+
+  .menu li + li {
+    border-top: 1px solid var(--eau);
+  }
+
+  .menu a {
+    padding: 0.95rem 0.25rem;
+    font-family: var(--titre);
+    font-size: 1.3rem;
+    font-weight: 650;
+  }
+
+  .menu__tel {
+    display: block;
+  }
+
+  .menu .menu__tel a {
+    color: var(--lagon);
+    font-family: var(--texte);
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 56rem) {
+  .menu ul {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .menu a {
+    padding: 0.55rem 0.6rem;
+  }
+
+  .menu__tel {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu,
+  .menu-bouton path {
+    transition: none !important;
   }
 }
 
 /* ------------------------------------------------------------ accueil : ouverture */
 
+/* Mobile : la photo d'abord, le texte dessous. Ordinateur : la photo occupe
+   toute la largeur et le texte se pose sur sa partie gauche, assombrie. */
 .hero {
-  padding-block: clamp(2rem, 5vw, 4.5rem) clamp(3rem, 6vw, 5.5rem);
+  position: relative;
   overflow: hidden;
+  background: var(--abysse);
+}
+
+.hero__photo img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: 68% 60%;
 }
 
 .hero__grille {
   display: grid;
-  gap: clamp(2rem, 4vw, 3.5rem);
-  align-items: center;
+  gap: 2rem;
+  padding-block: 2rem 3rem;
+  color: var(--blanc);
+}
+
+.hero h1 {
+  max-width: 13ch;
+  color: var(--blanc);
+  font-size: clamp(2.5rem, 1.2rem + 5.2vw, 5.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
 }
 
 .hero__texte .chapo {
   max-width: 34rem;
-  margin-top: 1.5rem;
-  color: var(--encre-douce);
+  margin-top: 1.25rem;
+  color: rgb(255 255 255 / 86%);
 }
 
 .hero__actions {
@@ -430,40 +598,38 @@ strong {
   margin-top: 2rem;
 }
 
+.hero .lien-fleche {
+  color: var(--blanc);
+}
+
 .hero__preuve {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem 0.75rem;
   margin-top: 1.75rem;
-  color: var(--encre-douce);
+  color: rgb(255 255 255 / 82%);
   font-size: 0.975rem;
 }
 
-.hero__visuel {
-  position: relative;
+.hero__preuve a {
+  color: var(--blanc);
 }
 
-.hero__visuel img {
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  border-radius: var(--rayon);
+.hero .etoiles {
+  fill: #f2c14e;
 }
 
 .offre {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.25rem 1rem;
+  gap: 0.15rem 1rem;
   align-items: center;
-  max-width: 25rem;
-  margin: -2.5rem 1rem 0;
-  padding: 1.1rem 1.25rem;
-  position: relative;
+  max-width: 24rem;
+  padding: 1rem 1.25rem;
   background: var(--sable);
-  border: 1px solid var(--sable-fonce);
   border-radius: var(--rayon-moyen);
-  box-shadow: var(--ombre);
+  box-shadow: 0 20px 40px -24px rgb(0 0 0 / 55%);
 }
 
 .offre__valeur {
@@ -489,19 +655,54 @@ strong {
 }
 
 @media (min-width: 60rem) {
-  .hero__grille {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  .hero {
+    display: grid;
+    min-height: min(calc(100svh - 4rem), 52rem);
   }
 
-  .hero__visuel {
-    margin-right: calc(-1 * clamp(0rem, (100vw - 74rem) / 2, 6rem));
+
+  /* Photo élargie et calée à gauche : la piscine passe à droite du texte,
+     quelle que soit la largeur de l'écran. */
+  .hero__photo {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .hero__photo img {
+    width: 118%;
+    max-width: none;
+    height: 100%;
+    aspect-ratio: auto;
+    object-position: 0 70%;
+  }
+
+  .hero__photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgb(3 33 41 / 90%) 0%, rgb(3 33 41 / 72%) 34%, rgb(3 33 41 / 0%) 62%),
+      linear-gradient(0deg, rgb(3 33 41 / 45%) 0%, rgb(3 33 41 / 0%) 35%);
+  }
+
+  .hero__grille {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    padding-block: 5rem 3.5rem;
+  }
+
+  .hero__texte .chapo {
+    font-size: 1.125rem;
+  }
+
+  .hero__texte .chapo {
+    max-width: 31rem;
   }
 
   .offre {
-    position: absolute;
-    left: -2.5rem;
-    bottom: -1.75rem;
-    margin: 0;
+    align-self: start;
   }
 }
 
@@ -811,7 +1012,9 @@ strong {
 }
 
 .tableau__prix a {
-  margin-left: 0.75rem;
+  display: inline-block;
+  margin: -0.75rem 0 -0.75rem 0.25rem;
+  padding: 0.75rem 0.5rem;
   font-weight: 650;
 }
 
@@ -1031,7 +1234,64 @@ strong {
 
 .avis footer strong {
   color: var(--encre);
-  text-transform: capitalize;
+}
+
+.avis .avis__note {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+/* Un avis mis en avant, en grand, en tête de liste (accueil). */
+.avis--vedette {
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background: var(--lagon);
+  border-color: var(--lagon);
+  color: var(--blanc);
+}
+
+.avis--vedette blockquote {
+  font-family: var(--titre);
+  font-size: clamp(1.35rem, 1rem + 1.3vw, 2.05rem);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+
+.avis--vedette blockquote p::before {
+  content: "«\00a0";
+}
+
+.avis--vedette blockquote p::after {
+  content: "\00a0»";
+}
+
+.avis--vedette footer,
+.avis--vedette footer strong {
+  color: rgb(255 255 255 / 88%);
+}
+
+@media (min-width: 40rem) {
+  .avis--vedette {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 64rem) {
+  .avis--vedette {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}
+
+.avis-source {
+  max-width: 62ch;
+  margin-top: 1.5rem;
+  color: var(--encre-douce);
+  font-size: 0.9rem;
 }
 
 /* ------------------------------------------------------------ configurateur */
@@ -1297,9 +1557,9 @@ strong {
 }
 
 .consentement input {
-  width: 1.4rem;
-  height: 1.4rem;
-  margin: 0.15rem 0 0;
+  width: 1.65rem;
+  height: 1.65rem;
+  margin: 0.05rem 0 0;
   accent-color: var(--lagon);
 }
 
@@ -1631,6 +1891,11 @@ strong {
   color: var(--blanc);
 }
 
+.pied li a {
+  display: inline-block;
+  padding-block: 0.35rem;
+}
+
 .pied__grille {
   display: grid;
   gap: 2.25rem;
@@ -1884,8 +2149,93 @@ strong {
   box-shadow: none;
 }
 
+/* Taille choisie, total livré et bouton : une barre qui reste en bas de l'écran
+   sur mobile tant que l'on parcourt les tailles et le récapitulatif. */
 .produit__action {
-  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-top: 1.25rem;
+  padding: 0.9rem 1rem;
+  background: var(--blanc);
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon-moyen);
+}
+
+.produit__total {
+  display: grid;
+  min-width: 0;
+  color: var(--encre-douce);
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.produit__total strong {
+  color: var(--encre);
+  font-family: var(--titre);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.produit__total small {
+  color: var(--encre-douce);
+  font-family: var(--texte);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.produit__action .bouton {
+  flex: none;
+  padding-inline: 1.6rem;
+}
+
+@media (max-width: 59.99rem) {
+  .produit__action {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    margin-inline: calc(-1 * var(--marge));
+    padding: 0.75rem var(--marge) calc(0.75rem + env(safe-area-inset-bottom));
+    border-width: 1px 0 0;
+    border-radius: 0;
+    box-shadow: 0 -16px 28px -22px rgb(11 42 51 / 45%);
+  }
+}
+
+/* Petits écrans : deux tailles par ligne, prix sous le nom. */
+@media (max-width: 35.99rem) {
+  .tailles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .taille {
+    grid-template-columns: 1fr;
+    align-content: start;
+    padding: 0.65rem 0.75rem;
+  }
+
+  .taille__nom {
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+
+  .taille__prix,
+  .taille__info {
+    grid-row: auto;
+  }
+
+  .taille__prix {
+    margin-top: 0.15rem;
+    font-size: 1.05rem;
+  }
+
+  .taille__info {
+    font-size: 0.8rem;
+  }
 }
 
 .garanties {
@@ -1973,8 +2323,8 @@ strong {
 .encadre {
   padding: 1.25rem 1.4rem;
   background: var(--eau);
-  border-left: 4px solid var(--lagon-clair);
-  border-radius: 0 var(--rayon-moyen) var(--rayon-moyen) 0;
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon-moyen);
 }
 
 .encadre--sable {
