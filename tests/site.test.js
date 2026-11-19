@@ -24,9 +24,10 @@ const PAGES = [
   'comparatif-piscine-ipoolgo.html',
   'mentions-legales.html',
   'cgv.html',
+  'commande.html',
   'merci.html'
 ];
-const NOINDEX = ['merci.html', '404.html'];
+const NOINDEX = ['commande.html', 'merci.html', '404.html'];
 const ALL_HTML = PAGES.concat(['404.html']);
 const SIZE_COUNT = catalog.MODEL_IDS.reduce((sum, id) => sum + catalog.MODELS[id].sizes.length, 0);
 
@@ -424,14 +425,14 @@ test('IndexNow : fichier de clé de 32 caractères hexadécimaux et charge utile
   assert.equal(read(`${payload.key}.txt`).trim(), payload.key);
   assert.equal(payload.host, 'ipoolgofrance.fr');
   assert.equal(payload.keyLocation, `${SITE}/${payload.key}.txt`);
-  assert.equal(payload.urlList.length, PAGES.length - 1);
+  assert.equal(payload.urlList.length, PAGES.filter((file) => !NOINDEX.includes(file)).length);
   assert.equal(indexnow.ENDPOINT, 'https://api.indexnow.org/indexnow');
 });
 
 // ------------------------------------------------------------------ parcours de commande
 
 test('formulaire de commande : champs, case CGV obligatoire, bouton bloqué par défaut', () => {
-  const source = html['index.html'];
+  const source = html['commande.html'];
   const form = /<form[^>]*data-commande[\s\S]*?<\/form>/.exec(source);
   assert.ok(form, 'formulaire de commande');
   ['nom', 'prenom', 'email', 'telephone', 'adresse', 'codePostal', 'ville'].forEach((name) => {
@@ -450,12 +451,31 @@ test('formulaire de commande : champs, case CGV obligatoire, bouton bloqué par 
   assert.match(form[0], /name="site_web"/, 'champ piège anti-robots');
 });
 
+test('commande sur sa propre page : liens « Commander », logos de paiement, avis sans date', () => {
+  ALL_HTML.forEach((file) => {
+    assert.ok(!/href="\/(?:\?[^"]*)?#commander"/.test(html[file]), `${file} : lien de commande vers l'accueil`);
+  });
+  ['piscine-ronde-ipoolgo.html', 'piscine-rectangulaire-ipoolgo.html'].forEach((file) => {
+    const links = all(html[file], /<a\b[^>]*data-commander[^>]*>/).map((m) => attr(m[0], 'href'));
+    assert.ok(links.length >= 2, `${file} : boutons Commander`);
+    links.forEach((href) => assert.match(decode(href), /^\/commande\.html\?modele=[a-z]+&taille=[0-9x]+$/, `${file} : ${href}`));
+  });
+  ['CB', 'Visa', 'Mastercard', 'Apple Pay'].forEach((name) => {
+    assert.match(html['commande.html'], new RegExp(`aria-label="(?:Carte bancaire )?${name}"`), `logo ${name}`);
+  });
+  assert.match(html['commande.html'], /3D Secure/);
+  ['index.html', 'piscine-ronde-ipoolgo.html', 'piscine-rectangulaire-ipoolgo.html'].forEach((file) => {
+    assert.ok(!/<footer><strong>[^<]*<\/strong>, <time/.test(html[file]), `${file} : date sur un avis`);
+    assert.ok(!/"datePublished"/.test(html[file]), `${file} : date dans le JSON-LD des avis`);
+  });
+});
+
 test('merci.html : tous les états du paiement et le bouton « Réessayer le paiement »', () => {
   const source = html['merci.html'];
   ['verification', 'paye', 'attente', 'echec', 'inconnu', 'erreur'].forEach((state) => {
     assert.match(source, new RegExp(`data-etat="${state}"`), `état ${state}`);
   });
-  const retries = all(source, /<a class="bouton[^"]*" href="\/#commander">Réessayer le paiement<\/a>/);
+  const retries = all(source, /<a class="bouton[^"]*" href="\/commande\.html">Réessayer le paiement<\/a>/);
   assert.ok(retries.length >= 3, 'bouton « Réessayer le paiement » vers le formulaire');
 });
 

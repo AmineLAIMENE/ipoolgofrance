@@ -89,7 +89,8 @@ Les pages s'affichent sur http://localhost:8080. Le paiement ne fonctionne qu'un
 ## Arborescence
 
 ```
-index.html                           accueil, sélecteur de taille, commande
+index.html                           accueil, modèles, avis
+commande.html                        page de commande : forme, taille, coordonnées, paiement
 piscine-ronde-ipoolgo.html           fiche de la piscine ronde
 piscine-rectangulaire-ipoolgo.html   fiche de la piscine rectangulaire
 comparatif-piscine-ipoolgo.html      comparatif Drop-Stitch, autoportante, tubulaire

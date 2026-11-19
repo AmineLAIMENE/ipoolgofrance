@@ -6,7 +6,8 @@ Site en français. Prix TTC en euros. Livraison en France métropolitaine unique
 
 ## Pages
 
-- [Accueil et commande](https://ipoolgofrance.fr/): les deux modèles, le sélecteur de taille avec prix, les avis d'acheteurs et le formulaire de commande.
+- [Accueil](https://ipoolgofrance.fr/): les deux modèles, leurs prix et les avis d'acheteurs.
+- [Commande](https://ipoolgofrance.fr/commande.html): choix de la forme et de la taille, total, coordonnées de livraison et paiement en ligne (Mollie).
 - [Piscine iPoolGo Ronde](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html): 9 tailles de Ø 2 m à Ø 6 m, fiche technique, installation, entretien, questions fréquentes.
 - [Piscine iPoolGo Rectangulaire](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html): 8 formats de 2 × 2 m à 6 × 5 m, fiche technique, installation sur terrasse, questions fréquentes.
 - [Comparatif des piscines hors-sol](https://ipoolgofrance.fr/comparatif-piscine-ipoolgo.html): Drop-Stitch, autoportante à boudin et tubulaire comparées (montage, parois, prix, rangement, réglementation), avec les sources.

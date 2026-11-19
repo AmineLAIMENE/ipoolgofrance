@@ -1,5 +1,5 @@
 /*
- * iPoolGo France : configurateur, formulaire de commande, page de retour de paiement
+ * iPoolGo France : configurateur, page de commande, page de retour de paiement
  * et bandeau cookies. Aucun appel externe avant le consentement, aucune clé d'API ici :
  * le paiement passe par les Netlify Functions.
  */
@@ -299,7 +299,7 @@
 
       // Sur une fiche produit, tous les liens de commande de la page suivent la taille choisie.
       $all('[data-commander]', fixedModel ? document : root).forEach(function (link) {
-        link.setAttribute('href', '/?modele=' + state.model + '&taille=' + state.size + '#commander');
+        link.setAttribute('href', '/commande.html?modele=' + state.model + '&taille=' + state.size);
       });
 
       if (planSvg) drawPlan(planSvg, planParts, quote.model, size);
@@ -541,27 +541,6 @@
     });
   }
 
-  // Liens « Choisir ce modèle » de l'accueil : sélection sans rechargement.
-  function initShortcuts(configurator) {
-    var target = $('#commander');
-    if (!target) return;
-    document.addEventListener('click', function (event) {
-      var link = event.target.closest ? event.target.closest('a[href^="/?modele="]') : null;
-      if (!link || event.ctrlKey || event.metaKey || event.shiftKey) return;
-      var params = new URLSearchParams(link.getAttribute('href').split('?')[1].split('#')[0]);
-      if (!catalog.getModel(params.get('modele'))) return;
-      event.preventDefault();
-      try {
-        history.replaceState(null, '', location.pathname + '#commander');
-      } catch (error) {
-        // Sans incidence.
-      }
-      configurator.select(params.get('modele'), params.get('taille'));
-      var smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      target.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' });
-    });
-  }
-
   // ------------------------------------------------------------------ retour de paiement (merci.html)
 
   function initThanks(root) {
@@ -678,7 +657,6 @@
       var configurator = initConfigurator(root);
       if (root.matches('form[data-commande]')) {
         initOrderForm(root, configurator);
-        initShortcuts(configurator);
       }
     });
 

@@ -159,6 +159,11 @@
     Content-Type = "text/plain; charset=utf-8"
 
 [[headers]]
+  for = "/commande.html"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+
+[[headers]]
   for = "/merci.html"
   [headers.values]
     X-Robots-Tag = "noindex"

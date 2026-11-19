@@ -25,6 +25,7 @@ const PAGES = [
   'comparatif-piscine-ipoolgo.html',
   'mentions-legales.html',
   'cgv.html',
+  'commande.html',
   'merci.html'
 ];
 
@@ -98,7 +99,7 @@ function renderTable(modelId) {
     : ['Modèle', 'Longueur × largeur', 'Hauteur', 'Baigneurs', 'Volume d’eau', 'Emprise au sol', 'Prix TTC'];
 
   const rows = model.sizes.map((size) => {
-    const link = `<a href="/?modele=${model.id}&amp;taille=${size.id}#commander" aria-label="Commander la ${esc(model.shortName)} ${esc(catalog.sizeLabel(size))}">Commander</a>`;
+    const link = `<a href="/commande.html?modele=${model.id}&amp;taille=${size.id}" aria-label="Commander la ${esc(model.shortName)} ${esc(catalog.sizeLabel(size))}">Commander</a>`;
     const area = `${String(catalog.groundArea(size)).replace('.', ',')}${NBSP}m²`;
     const volume = `environ ${litres(size.volume)}`;
     const price = `<td class="tableau__prix"><strong>${esc(eur(size.price))}</strong> ${link}</td>`;
