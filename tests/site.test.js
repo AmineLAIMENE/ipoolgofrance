@@ -329,12 +329,10 @@ test('adresse de contact : contact@gigifrance.fr partout, plus aucune trace de l
   });
 });
 
-test('piscine test ronde : 1 € port compris, commandable par lien, invisible partout ailleurs', () => {
-  const quote = catalog.quote('ronde', 'test-1m');
-  assert.equal(quote.label, 'Piscine test ronde');
-  assert.equal(quote.total, 1);
+test('piscine test à 1 € retirée : plus commandable, plus aucune trace', () => {
+  assert.equal(catalog.quote('ronde', 'test-1m'), null);
   catalog.MODEL_IDS.forEach((id) => {
-    assert.ok(!catalog.MODELS[id].sizes.some((size) => size.id.startsWith('test')), `${id} : taille test dans les tailles publiques`);
+    assert.ok(!('testSizes' in catalog.MODELS[id]), `${id} : tailles de test`);
   });
   PAGES.concat(['llms.txt', 'google-shopping.xml', 'sitemap.xml']).forEach((file) => {
     assert.ok(!/test-1m|Piscine test/i.test(read(file)), `${file} : la piscine test ne doit pas apparaître`);

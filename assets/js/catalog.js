@@ -84,13 +84,6 @@
         round('500x120', 500, 120, 2200, '5 à 7', 88, 20700),
         round('500x150', 500, 150, 2600, '6 à 7', 110, 26000),
         round('600x150', 600, 150, 3400, '8 à 10', 135, 37300)
-      ],
-      // Tailles de test : commandables par leur seul lien
-      // (/commande.html?modele=ronde&taille=test-1m), absentes des pages,
-      // des données structurées, du flux Google Shopping et de llms.txt.
-      // À supprimer avant l'ouverture de la boutique.
-      testSizes: [
-        Object.assign(round('test-1m', 100, 50, 1, '1', null, 350), { label: 'Piscine test ronde', shipping: 0 })
       ]
     },
     rectangulaire: {
@@ -128,7 +121,7 @@
   function getSize(modelId, sizeId) {
     var model = getModel(modelId);
     if (!model || typeof sizeId !== 'string') return null;
-    var sizes = model.sizes.concat(model.testSizes || []);
+    var sizes = model.sizes;
     for (var i = 0; i < sizes.length; i++) {
       if (sizes[i].id === sizeId) return sizes[i];
     }
@@ -181,7 +174,7 @@
     var size = getSize(modelId, sizeId);
     var mode = getMode(modeId === undefined ? DEFAULT_MODE : modeId);
     if (!model || !size || !mode) return null;
-    var shipping = mode.free ? 0 : typeof size.shipping === 'number' ? size.shipping : SHIPPING_EUR;
+    var shipping = mode.free ? 0 : SHIPPING_EUR;
     return {
       model: model,
       size: size,

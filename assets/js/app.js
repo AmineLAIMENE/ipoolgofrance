@@ -280,7 +280,6 @@
       $all('[data-tailles]', root).forEach(function (group) {
         group.hidden = group.getAttribute('data-tailles') !== state.model;
       });
-      // Une taille sans case (taille de test) ne laisse aucune autre case cochée.
       $all('input[name="taille-' + state.model + '"]', root).forEach(function (input) {
         input.checked = input.value === state.size;
       });
