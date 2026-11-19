@@ -320,6 +320,15 @@ test('les pages, llms.txt et le flux sont synchronisés avec le catalogue', () =
   assert.equal(sync.renderFeed(), read('google-shopping.xml'), 'google-shopping.xml désynchronisé');
 });
 
+test('adresse de contact : contact@gigifrance.fr partout, plus aucune trace de l\'ancienne', () => {
+  ALL_HTML.concat(['llms.txt', 'assets/js/app.js', 'netlify/lib/emails.js']).forEach((file) => {
+    assert.ok(!read(file).includes('contact@piscineipoolgo.com'), `${file} : ancienne adresse de contact`);
+  });
+  ALL_HTML.forEach((file) => {
+    assert.ok(read(file).includes('href="mailto:contact@gigifrance.fr"'), `${file} : lien mailto manquant`);
+  });
+});
+
 test('piscine test ronde : 1 € port compris, commandable par lien, invisible partout ailleurs', () => {
   const quote = catalog.quote('ronde', 'test-1m');
   assert.equal(quote.label, 'Piscine test ronde');

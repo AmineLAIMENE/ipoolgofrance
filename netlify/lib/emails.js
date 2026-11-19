@@ -6,7 +6,7 @@
 const catalog = require('../../assets/js/catalog.js');
 const { escapeHtml, siteUrl } = require('./shared.js');
 
-const SUPPORT_EMAIL = 'contact@piscineipoolgo.com';
+const SUPPORT_EMAIL = 'contact@gigifrance.fr';
 const SUPPORT_PHONE = '07 80 80 67 64';
 const LEGAL_LINE = 'SAS Virage, 10 rue Louis Vicat, 75015 Paris. SIRET 892 260 712 00021.';
 

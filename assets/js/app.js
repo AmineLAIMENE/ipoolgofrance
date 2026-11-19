@@ -528,7 +528,7 @@
           if (result.status === 409) {
             showMessage('Le prix affiché n’était plus à jour. Rechargez la page, vérifiez le total puis relancez le paiement.');
           } else {
-            showMessage(body.message || 'Le paiement n’a pas pu démarrer. Réessayez dans quelques minutes ou écrivez-nous à contact@piscineipoolgo.com.');
+            showMessage(body.message || 'Le paiement n’a pas pu démarrer. Réessayez dans quelques minutes ou appelez-nous au 07\u00a080\u00a080\u00a067\u00a064.');
           }
         })
         .catch(function () {

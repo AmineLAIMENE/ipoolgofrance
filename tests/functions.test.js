@@ -416,7 +416,7 @@ test('webhook : paiement payé, vérifié chez Stripe puis deux e-mails Brevo', 
   assert.equal(customer.body.replyTo.email, 'vendeur@example.com');
   assert.ok(customer.body.htmlContent.includes('IPG-261119-ABCDE'));
   assert.ok(!customer.body.htmlContent.includes(SESSION_ID), 'le client voit la référence courte');
-  for (const expected of ['Pompe de gonflage électrique', 'Système de filtration à sable', 'Offert', 'SAS Virage', 'garantie légale de conformité de 2 ans', 'contact@piscineipoolgo.com']) {
+  for (const expected of ['Pompe de gonflage électrique', 'Système de filtration à sable', 'Offert', 'SAS Virage', 'garantie légale de conformité de 2 ans', 'contact@gigifrance.fr']) {
     assert.ok(customer.body.htmlContent.includes(expected), `e-mail client sans ${expected}`);
   }
 
