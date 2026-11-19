@@ -535,7 +535,7 @@
         });
     });
 
-    // Retour arrière depuis Mollie : la page sort du cache avec le bouton encore verrouillé.
+    // Retour arrière depuis Stripe : la page sort du cache avec le bouton encore verrouillé.
     window.addEventListener('pageshow', function (event) {
       if (event.persisted) setSending(false);
     });
@@ -544,7 +544,10 @@
   // ------------------------------------------------------------------ retour de paiement (merci.html)
 
   function initThanks(root) {
-    var paymentId = read('sessionStorage', KEYS.payment) || read('localStorage', KEYS.payment);
+    // Stripe renvoie ici avec ?session_id=cs_... ; l'adresse est ensuite nettoyée.
+    var fromUrl = new URLSearchParams(location.search).get('session_id');
+    if (fromUrl && history.replaceState) history.replaceState(null, '', location.pathname);
+    var paymentId = fromUrl || read('sessionStorage', KEYS.payment) || read('localStorage', KEYS.payment);
     var attempts = 0;
     var timer = null;
 
@@ -562,7 +565,7 @@
     function fill(order) {
       var shipping = Number(order.livraison);
       var values = {
-        reference: paymentId,
+        reference: order.reference || paymentId,
         produit: nb(order.produit || ''),
         prix: catalog.formatEUR(Number(order.prix)),
         livraison: shipping > 0 ? catalog.formatEUR(shipping) : 'Offerte',
@@ -585,7 +588,7 @@
       if (status === 'paid') {
         fill(order);
         track('purchase', {
-          transaction_id: paymentId,
+          transaction_id: order.reference || paymentId,
           currency: 'EUR',
           value: Number(order.total),
           shipping: Number(order.livraison),

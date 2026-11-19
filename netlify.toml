@@ -1,4 +1,4 @@
-# iPoolGo France : site statique + Netlify Functions (Mollie, Brevo).
+# iPoolGo France : site statique + Netlify Functions (Stripe, Brevo).
 # Les clés se règlent dans Netlify (Site configuration > Environment variables), jamais ici.
 
 [build]

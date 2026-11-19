@@ -3,15 +3,16 @@
 // Outils communs aux trois fonctions. Les clés ne sont lues que dans
 // process.env (variables d'environnement Netlify), jamais renvoyées ni journalisées.
 
-const MOLLIE_API = 'https://api.mollie.com/v2';
+const STRIPE_API = 'https://api.stripe.com/v1';
 const BREVO_API = 'https://api.brevo.com/v3/smtp/email';
 const DEFAULT_SITE_URL = require('../../assets/js/catalog.js').SITE_URL;
 const ORDER_SOURCE = 'ipoolgofrance.fr';
-// Le webhook enchaîne trois appels (Mollie, Brevo, Mollie) : ils doivent tenir
+// Le webhook enchaîne trois appels (Stripe, Brevo, Stripe) : ils doivent tenir
 // dans les 10 secondes accordées à une fonction Netlify.
 const TIMEOUT_MS = 3000;
 
-const PAYMENT_ID = /^tr_[A-Za-z0-9]{6,40}$/;
+// Identifiant d'une session Stripe Checkout (cs_live_... ou cs_test_...).
+const PAYMENT_ID = /^cs_(live|test)_[A-Za-z0-9]{10,200}$/;
 
 function siteUrl() {
   const url = (process.env.SITE_URL || DEFAULT_SITE_URL).trim().replace(/\/+$/, '');
@@ -66,25 +67,66 @@ class ApiError extends Error {
   }
 }
 
-async function mollie(method, path, body) {
-  const key = process.env.MOLLIE_API_KEY;
-  if (!key) throw new ApiError('Mollie', 0, 'variable MOLLIE_API_KEY absente');
+// Stripe attend des paramètres encodés en formulaire : { a: { b: 1 } } -> a[b]=1.
+function formEncode(params, prefix, out) {
+  const pairs = out || new URLSearchParams();
+  Object.keys(params || {}).forEach((key) => {
+    const value = params[key];
+    const name = prefix ? `${prefix}[${key}]` : key;
+    if (value === undefined || value === null) return;
+    if (typeof value === 'object') formEncode(value, name, pairs);
+    else pairs.append(name, String(value));
+  });
+  return pairs;
+}
 
-  const response = await fetch(MOLLIE_API + path, {
+async function stripe(method, path, params) {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new ApiError('Stripe', 0, 'variable STRIPE_SECRET_KEY absente');
+
+  const response = await fetch(STRIPE_API + path, {
     method,
     headers: Object.assign(
       { Authorization: `Bearer ${key}`, Accept: 'application/json' },
-      body ? { 'Content-Type': 'application/json' } : {}
+      params ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}
     ),
-    body: body ? JSON.stringify(body) : undefined,
+    body: params ? formEncode(params).toString() : undefined,
     signal: AbortSignal.timeout(TIMEOUT_MS)
   });
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new ApiError('Mollie', response.status, [data.title, data.detail].filter(Boolean).join(' - '));
+    const error = data.error || {};
+    throw new ApiError('Stripe', response.status, [error.code, error.message].filter(Boolean).join(' - '));
   }
   return data;
+}
+
+// Session Checkout lue avec son PaymentIntent et sa dernière transaction.
+function readSession(id) {
+  return stripe('GET', `/checkout/sessions/${id}?expand[]=payment_intent.latest_charge`);
+}
+
+// Ramène une session Stripe à la forme utilisée par les e-mails et merci.html :
+// montant en euros ("1759.00"), statut simple, métadonnées de la commande.
+function toPayment(session) {
+  let status = 'open';
+  if (session.status === 'expired') status = 'expired';
+  else if (session.status === 'complete') status = session.payment_status === 'unpaid' ? 'pending' : 'paid';
+
+  const intent = session.payment_intent && typeof session.payment_intent === 'object' ? session.payment_intent : null;
+  const charge = intent && intent.latest_charge && typeof intent.latest_charge === 'object' ? intent.latest_charge : null;
+  return {
+    id: session.id,
+    status,
+    amount: {
+      currency: String(session.currency || '').toUpperCase(),
+      value: (Number(session.amount_total || 0) / 100).toFixed(2)
+    },
+    metadata: Object.assign({}, session.metadata || {}, (intent && intent.metadata) || {}),
+    intentId: intent ? intent.id : null,
+    refunded: Boolean(charge && (charge.amount_refunded > 0 || charge.disputed))
+  };
 }
 
 async function sendEmail(message) {
@@ -123,7 +165,10 @@ module.exports = {
   rawBody,
   isPaymentId,
   isAllowedOrigin,
-  mollie,
+  stripe,
+  formEncode,
+  readSession,
+  toPayment,
   sendEmail,
   escapeHtml
 };

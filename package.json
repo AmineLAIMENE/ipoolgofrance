@@ -2,7 +2,7 @@
   "name": "ipoolgofrance",
   "version": "1.0.0",
   "private": true,
-  "description": "Site statique iPoolGo France (SAS Virage) : HTML, CSS et JavaScript sans dépendance, paiement Mollie et e-mails Brevo via Netlify Functions.",
+  "description": "Site statique iPoolGo France (SAS Virage) : HTML, CSS et JavaScript sans dépendance, paiement Stripe et e-mails Brevo via Netlify Functions.",
   "license": "UNLICENSED",
   "engines": {
     "node": ">=18"

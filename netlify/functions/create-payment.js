@@ -1,15 +1,28 @@
 'use strict';
 
 // POST /.netlify/functions/create-payment
-// Valide la commande, recalcule le prix depuis le catalogue puis crée le paiement Mollie.
+// Valide la commande, recalcule le prix depuis le catalogue puis crée la session de paiement Stripe Checkout.
 // Le montant envoyé par le navigateur ne sert qu'à détecter un prix affiché périmé ou falsifié.
 
 const catalog = require('../../assets/js/catalog.js');
-const { ORDER_SOURCE, siteUrl, json, header, rawBody, isAllowedOrigin, mollie } = require('../lib/shared.js');
+const crypto = require('crypto');
+const { ORDER_SOURCE, siteUrl, json, header, rawBody, isAllowedOrigin, stripe } = require('../lib/shared.js');
 
 const MAX_BODY_BYTES = 4096;
-// Mollie limite les métadonnées à environ 1 ko ; le webhook y ajoute ensuite deux dates d'envoi.
-const MAX_METADATA_BYTES = 900;
+// Référence courte donnée au client (IPG-AAMMJJ-XXXXX), sans caractère ambigu.
+const REFERENCE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function orderReference(now) {
+  const date = now.toISOString().slice(2, 10).replace(/-/g, '');
+  const bytes = crypto.randomBytes(5);
+  let suffix = '';
+  for (const byte of bytes) suffix += REFERENCE_CHARS[byte % REFERENCE_CHARS.length];
+  return `IPG-${date}-${suffix}`;
+}
+
+function cents(amount) {
+  return Math.round(amount * 100);
+}
 
 // champ du formulaire -> [clé de métadonnée, longueur maximale]
 const FIELDS = {
@@ -119,42 +132,53 @@ exports.handler = async function handler(event) {
     return json(400, { error: 'champs_invalides', message: 'Certains champs sont à corriger.', champs: errors });
   }
 
+  const now = new Date();
+  const reference = orderReference(now);
   const metadata = {
     source: ORDER_SOURCE,
+    reference,
     modele: quote.model.id,
     taille: quote.size.id,
     produit: quote.label,
     prix: catalog.formatAmount(quote.price),
     livraison: catalog.formatAmount(quote.shipping),
     total: catalog.formatAmount(quote.total),
-    cgv_acceptees: new Date().toISOString()
+    cgv_acceptees: now.toISOString()
   };
   for (const field of Object.keys(FIELDS)) {
     metadata[FIELDS[field][0]] = customer[field];
   }
-  if (Buffer.byteLength(JSON.stringify(metadata), 'utf8') > MAX_METADATA_BYTES) {
-    return json(400, {
-      error: 'champs_invalides',
-      message: 'Certains champs sont à corriger.',
-      champs: { adresse: 'Adresse trop longue, merci de l’abréger.' }
+
+  const lineItems = [
+    { quantity: 1, price_data: { currency: 'eur', unit_amount: cents(quote.price), product_data: { name: quote.label } } }
+  ];
+  if (quote.shipping > 0) {
+    lineItems.push({
+      quantity: 1,
+      price_data: { currency: 'eur', unit_amount: cents(quote.shipping), product_data: { name: 'Livraison en France métropolitaine' } }
     });
   }
 
   const site = siteUrl();
-  const payment = {
-    amount: { currency: 'EUR', value: catalog.formatAmount(quote.total) },
-    description: `iPoolGo France - ${quote.label}`,
-    redirectUrl: `${site}/merci.html`,
-    webhookUrl: `${site}/.netlify/functions/webhook`,
-    locale: 'fr_FR',
-    metadata
+  const back = new URLSearchParams({ modele: quote.model.id, taille: quote.size.id });
+  // Les moyens de paiement proposés sont ceux activés dans le tableau de bord Stripe.
+  const session = {
+    mode: 'payment',
+    locale: 'fr',
+    line_items: lineItems,
+    customer_email: customer.email,
+    client_reference_id: reference,
+    success_url: `${site}/merci.html?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${site}/commande.html?${back.toString()}`,
+    metadata,
+    // Copie sur le paiement : la commande se lit dans Stripe > Paiements, et le webhook y note les e-mails envoyés.
+    payment_intent_data: { description: `iPoolGo France ${reference} - ${quote.label}`, metadata }
   };
 
   try {
-    const created = await mollie('POST', '/payments', payment);
-    const checkoutUrl = created && created._links && created._links.checkout && created._links.checkout.href;
-    if (!created.id || !checkoutUrl) throw new Error('réponse Mollie sans lien de paiement');
-    return json(200, { paymentId: created.id, checkoutUrl });
+    const created = await stripe('POST', '/checkout/sessions', session);
+    if (!created.id || !/^https:\/\//.test(created.url || '')) throw new Error('réponse Stripe sans lien de paiement');
+    return json(200, { paymentId: created.id, checkoutUrl: created.url });
   } catch (error) {
     console.error('create-payment :', error.message);
     return json(502, {
@@ -163,4 +187,3 @@ exports.handler = async function handler(event) {
     });
   }
 };
-

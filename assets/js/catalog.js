@@ -173,7 +173,7 @@
     return fixed.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f') + '\u00a0€';
   }
 
-  // 1399 -> "1399.00" (format attendu par Mollie et Google Merchant)
+  // 1399 -> "1399.00" (format des montants dans les métadonnées et Google Merchant)
   function formatAmount(amount) {
     return amount.toFixed(2);
   }

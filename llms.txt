@@ -7,7 +7,7 @@ Site en français. Prix TTC en euros. Livraison en France métropolitaine unique
 ## Pages
 
 - [Accueil](https://ipoolgofrance.fr/): les deux modèles, leurs prix et les avis d'acheteurs.
-- [Commande](https://ipoolgofrance.fr/commande.html): choix de la forme et de la taille, total, coordonnées de livraison et paiement en ligne (Mollie).
+- [Commande](https://ipoolgofrance.fr/commande.html): choix de la forme et de la taille, total, coordonnées de livraison et paiement en ligne (Stripe).
 - [Piscine iPoolGo Ronde](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html): 9 tailles de Ø 2 m à Ø 6 m, fiche technique, installation, entretien, questions fréquentes.
 - [Piscine iPoolGo Rectangulaire](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html): 8 formats de 2 × 2 m à 6 × 5 m, fiche technique, installation sur terrasse, questions fréquentes.
 - [Comparatif des piscines hors-sol](https://ipoolgofrance.fr/comparatif-piscine-ipoolgo.html): Drop-Stitch, autoportante à boudin et tubulaire comparées (montage, parois, prix, rangement, réglementation), avec les sources.
@@ -54,7 +54,7 @@ Offerts avec chaque piscine : pompe de gonflage électrique (valeur 150 EUR) et 
 - Délai : 5 à 10 jours ouvrés après confirmation de la commande. Toutes les tailles sont disponibles à la commande. Les piscines de plus de 5 m sont livrées sur rendez-vous.
 - Rétractation : 14 jours après la livraison, frais de retour à la charge du client.
 - Garanties : garantie légale de conformité de 2 ans et garantie des vices cachés.
-- Paiement : par carte sur la page sécurisée de Mollie.
+- Paiement : par carte sur la page sécurisée de Stripe.
 - Urbanisme : aucune formalité pour un bassin de 10 m² ou moins hors secteur protégé, ni pour une piscine installée 3 mois par an au maximum. Déclaration préalable entre 10 et 100 m². Source : https://www.service-public.gouv.fr/particuliers/vosdroits/F31404
 
 ## Vendeur et contact

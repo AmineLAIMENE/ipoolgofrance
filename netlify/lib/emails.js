@@ -16,6 +16,11 @@ function euros(value) {
 }
 
 // "300x120" -> "Ø 3 m × 1,20 m" quand la taille existe encore au catalogue.
+// Référence courte créée avec la commande ; l'identifiant Stripe en secours.
+function reference(payment) {
+  return (payment.metadata && payment.metadata.reference) || payment.id;
+}
+
 function sizeText(metadata) {
   const size = catalog.getSize(metadata.modele, metadata.taille);
   return size ? catalog.sizeLabel(size) : String(metadata.taille || '');
@@ -92,7 +97,8 @@ function sellerEmail(payment, env) {
     [
       '<h1 style="margin:0 0 16px;font-size:22px;color:#005f73;">Nouvelle commande payée</h1>',
       warning ? `<p style="padding:12px;background:#fdecea;border-radius:8px;color:#8a1f11;">${escapeHtml(warning)}</p>` : '',
-      `<p style="margin:0 0 4px;">ID Mollie : <strong>${escapeHtml(payment.id)}</strong></p>`,
+      `<p style="margin:0 0 4px;">Référence : <strong>${escapeHtml(reference(payment))}</strong></p>`,
+      `<p style="margin:0 0 4px;">Session Stripe : ${escapeHtml(payment.id)}</p>`,
       `<p style="margin:0 0 4px;">Modèle : <strong>${escapeHtml(metadata.produit)}</strong></p>`,
       `<p style="margin:0 0 4px;">Taille : <strong>${escapeHtml(sizeText(metadata))}</strong></p>`,
       `<p style="margin:0 0 16px;">Montant encaissé : <strong>${escapeHtml(total)}</strong></p>`,
@@ -109,7 +115,8 @@ function sellerEmail(payment, env) {
   const text = [
     'Nouvelle commande iPoolGo France payée',
     warning,
-    `ID Mollie : ${payment.id}`,
+    `Référence : ${reference(payment)}`,
+    `Session Stripe : ${payment.id}`,
     `Modèle : ${metadata.produit}`,
     `Taille : ${sizeText(metadata)}`,
     `Montant encaissé : ${total}`,
@@ -143,7 +150,7 @@ function customerEmail(payment, env) {
     'Votre commande est confirmée',
     [
       `<h1 style="margin:0 0 16px;font-size:22px;color:#005f73;">Merci ${escapeHtml(metadata.prenom)}, votre commande est confirmée</h1>`,
-      `<p style="margin:0 0 16px;">Nous avons bien reçu votre paiement. Votre référence de commande est <strong>${escapeHtml(payment.id)}</strong>. Gardez cet e-mail, il vous servira pour toute demande.</p>`,
+      `<p style="margin:0 0 16px;">Nous avons bien reçu votre paiement. Votre référence de commande est <strong>${escapeHtml(reference(payment))}</strong>. Gardez cet e-mail, il vous servira pour toute demande.</p>`,
       orderTable(payment),
       '<h2 style="margin:0 0 8px;font-size:17px;color:#005f73;">Adresse de livraison</h2>',
       `<p style="margin:0 0 20px;">${address.map(escapeHtml).join('<br>')}</p>`,
@@ -160,7 +167,7 @@ function customerEmail(payment, env) {
   const gifts = catalog.GIFTS.map((gift) => `${gift.name} : offert (valeur ${euros(gift.value)})`);
   const text = [
     `Merci ${metadata.prenom}, votre commande iPoolGo France est confirmée.`,
-    `Référence : ${payment.id}`,
+    `Référence : ${reference(payment)}`,
     '',
     `${metadata.produit} : ${euros(metadata.prix)}`,
     gifts.join('\n'),

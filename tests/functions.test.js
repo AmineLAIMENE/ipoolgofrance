@@ -1,10 +1,11 @@
 'use strict';
 
 // Tests simulés des Netlify Functions : aucun appel réseau, `fetch` est remplacé
-// par un faux Mollie / Brevo qui enregistre les requêtes reçues.
+// par un faux Stripe / Brevo qui enregistre les requêtes reçues.
 
 const { test, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
+const crypto = require('crypto');
 
 const catalog = require('../assets/js/catalog.js');
 const createPayment = require('../netlify/functions/create-payment.js').handler;
@@ -13,25 +14,35 @@ const webhook = require('../netlify/functions/webhook.js').handler;
 
 const realFetch = global.fetch;
 const realConsole = { error: console.error, warn: console.warn };
+const SESSION_ID = 'cs_test_a1B2c3D4e5F6g7H8i9J0kLmNoPq';
+const STRIPE = 'https://api.stripe.com/v1';
+const BREVO = 'https://api.brevo.com/v3/smtp/email';
+const TOTAL = 1399 + catalog.SHIPPING_EUR;
 let calls;
 
 function reply(status, body) {
   return { ok: status >= 200 && status < 300, status, json: async () => body };
 }
 
+// Stripe reçoit du formulaire encodé (a[b][c]=x), Brevo du JSON.
+function parseBody(options) {
+  if (!options.body) return null;
+  const type = (options.headers && options.headers['Content-Type']) || '';
+  return type.includes('json') ? JSON.parse(options.body) : Object.fromEntries(new URLSearchParams(options.body));
+}
+
 // routes : fonction (call) => réponse, appelée pour chaque requête sortante.
 function mockFetch(route) {
   calls = [];
   global.fetch = async (url, options = {}) => {
-    const call = {
-      url: String(url),
-      method: options.method || 'GET',
-      headers: options.headers || {},
-      body: options.body ? JSON.parse(options.body) : null
-    };
+    const call = { url: String(url), method: options.method || 'GET', headers: options.headers || {}, body: parseBody(options) };
     calls.push(call);
     return route(call);
   };
+}
+
+function created() {
+  return reply(200, { id: SESSION_ID, url: 'https://checkout.stripe.com/c/pay/' + SESSION_ID });
 }
 
 const CUSTOMER = {
@@ -45,10 +56,7 @@ const CUSTOMER = {
 };
 
 function order(overrides) {
-  return Object.assign(
-    { modele: 'ronde', taille: '300x120', montant: 1399 + catalog.SHIPPING_EUR, cgv: true, client: CUSTOMER },
-    overrides
-  );
+  return Object.assign({ modele: 'ronde', taille: '300x120', montant: TOTAL, cgv: true, client: CUSTOMER }, overrides);
 }
 
 function post(body, headers) {
@@ -59,20 +67,25 @@ function post(body, headers) {
   };
 }
 
-function paidPayment(overrides) {
+// Session Stripe Checkout payée, telle que relue avec expand[]=payment_intent.latest_charge.
+function paidSession(overrides, intentMetadata, charge) {
   return Object.assign(
     {
-      id: 'tr_WDqYK6vllg',
-      status: 'paid',
-      amount: { currency: 'EUR', value: catalog.formatAmount(1399 + catalog.SHIPPING_EUR) },
+      id: SESSION_ID,
+      object: 'checkout.session',
+      status: 'complete',
+      payment_status: 'paid',
+      amount_total: TOTAL * 100,
+      currency: 'eur',
       metadata: {
         source: 'ipoolgofrance.fr',
+        reference: 'IPG-261119-ABCDE',
         modele: 'ronde',
         taille: '300x120',
         produit: 'Piscine iPoolGo Ronde Ø 3 m × 1,20 m',
         prix: '1399.00',
         livraison: catalog.formatAmount(catalog.SHIPPING_EUR),
-        total: catalog.formatAmount(1399 + catalog.SHIPPING_EUR),
+        total: catalog.formatAmount(TOTAL),
         nom: 'Martin',
         prenom: 'Camille',
         email: 'camille.martin@example.com',
@@ -80,26 +93,32 @@ function paidPayment(overrides) {
         adresse: '12 rue des Lilas',
         code_postal: '69003',
         ville: 'Lyon'
+      },
+      payment_intent: {
+        id: 'pi_3QabcDEF',
+        metadata: intentMetadata || {},
+        latest_charge: Object.assign({ id: 'ch_1', amount_refunded: 0, disputed: false }, charge)
       }
     },
     overrides
   );
 }
 
-function mollieWebhook(body, contentType) {
-  return {
-    httpMethod: 'POST',
-    headers: { 'content-type': contentType || 'application/x-www-form-urlencoded' },
-    body
-  };
+function stripeEvent(id, type) {
+  return JSON.stringify({ id: 'evt_1', type: type || 'checkout.session.completed', data: { object: { id, object: 'checkout.session' } } });
+}
+
+function hook(body, headers) {
+  return { httpMethod: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, headers), body };
 }
 
 beforeEach(() => {
-  process.env.MOLLIE_API_KEY = 'test_cle_mollie_factice';
+  process.env.STRIPE_SECRET_KEY = 'rk_test_cle_stripe_factice';
   process.env.BREVO_API_KEY = 'cle_brevo_factice';
   process.env.SELLER_EMAIL = 'vendeur@example.com';
   process.env.SENDER_EMAIL = 'commandes@example.com';
   delete process.env.SITE_URL;
+  delete process.env.STRIPE_WEBHOOK_SECRET;
   console.error = () => {};
   console.warn = () => {};
   mockFetch(() => {
@@ -115,77 +134,112 @@ afterEach(() => {
 
 // ---------------------------------------------------------------- create-payment
 
-test('create-payment : commande valide, prix recalculé et payload Mollie conforme', async () => {
-  mockFetch(() => reply(201, { id: 'tr_WDqYK6vllg', _links: { checkout: { href: 'https://www.mollie.com/checkout/select-method/WDqYK6vllg' } } }));
+test('create-payment : commande valide, prix recalculé et session Stripe conforme', async () => {
+  mockFetch(created);
 
   const response = await createPayment(post(order()));
   assert.equal(response.statusCode, 200);
   assert.deepEqual(JSON.parse(response.body), {
-    paymentId: 'tr_WDqYK6vllg',
-    checkoutUrl: 'https://www.mollie.com/checkout/select-method/WDqYK6vllg'
+    paymentId: SESSION_ID,
+    checkoutUrl: 'https://checkout.stripe.com/c/pay/' + SESSION_ID
   });
 
   assert.equal(calls.length, 1);
   const call = calls[0];
-  assert.equal(call.url, 'https://api.mollie.com/v2/payments');
+  const body = call.body;
+  assert.equal(call.url, `${STRIPE}/checkout/sessions`);
   assert.equal(call.method, 'POST');
-  assert.equal(call.headers.Authorization, 'Bearer test_cle_mollie_factice');
-  assert.deepEqual(call.body.amount, { currency: 'EUR', value: catalog.formatAmount(1399 + catalog.SHIPPING_EUR) });
-  assert.equal(call.body.redirectUrl, 'https://ipoolgofrance.fr/merci.html');
-  assert.equal(call.body.webhookUrl, 'https://ipoolgofrance.fr/.netlify/functions/webhook');
-  assert.equal(call.body.locale, 'fr_FR');
-  assert.match(call.body.description, /Ronde Ø 3 m × 1,20 m/);
+  assert.equal(call.headers.Authorization, 'Bearer rk_test_cle_stripe_factice');
+  assert.equal(call.headers['Content-Type'], 'application/x-www-form-urlencoded');
+  assert.equal(body.mode, 'payment');
+  assert.equal(body.locale, 'fr');
+  assert.equal(body.customer_email, 'camille.martin@example.com');
+  assert.equal(body['line_items[0][quantity]'], '1');
+  assert.equal(body['line_items[0][price_data][currency]'], 'eur');
+  assert.equal(body['line_items[0][price_data][unit_amount]'], '139900');
+  assert.equal(body['line_items[0][price_data][product_data][name]'], 'Piscine iPoolGo Ronde Ø 3 m × 1,20 m');
+  assert.equal(body['line_items[1][price_data][unit_amount]'], String(catalog.SHIPPING_EUR * 100));
+  assert.equal(body['line_items[1][price_data][product_data][name]'], 'Livraison en France métropolitaine');
+  assert.equal(body.success_url, 'https://ipoolgofrance.fr/merci.html?session_id={CHECKOUT_SESSION_ID}');
+  assert.equal(body.cancel_url, 'https://ipoolgofrance.fr/commande.html?modele=ronde&taille=300x120');
+  assert.ok(!('payment_method_types[0]' in body), 'les moyens de paiement viennent du tableau de bord Stripe');
 
-  const metadata = call.body.metadata;
-  assert.equal(metadata.source, 'ipoolgofrance.fr');
-  assert.equal(metadata.produit, 'Piscine iPoolGo Ronde Ø 3 m × 1,20 m');
-  assert.equal(metadata.taille, '300x120');
-  assert.equal(metadata.prix, '1399.00');
-  assert.equal(metadata.nom, 'Martin');
-  assert.equal(metadata.prenom, 'Camille');
-  assert.equal(metadata.email, 'camille.martin@example.com');
-  assert.equal(metadata.telephone, '0612345678');
-  assert.equal(metadata.adresse, '12 rue des Lilas');
-  assert.equal(metadata.code_postal, '69003');
-  assert.equal(metadata.ville, 'Lyon');
-  assert.ok(Buffer.byteLength(JSON.stringify(metadata)) < 1000);
+  assert.match(body['metadata[reference]'], /^IPG-\d{6}-[A-HJ-NP-Z2-9]{5}$/);
+  assert.equal(body.client_reference_id, body['metadata[reference]']);
+  assert.match(body['payment_intent_data[description]'], /^iPoolGo France IPG-\d{6}-.{5} - Piscine iPoolGo Ronde Ø 3 m × 1,20 m$/);
+  const expected = {
+    source: 'ipoolgofrance.fr',
+    produit: 'Piscine iPoolGo Ronde Ø 3 m × 1,20 m',
+    taille: '300x120',
+    prix: '1399.00',
+    total: catalog.formatAmount(TOTAL),
+    nom: 'Martin',
+    prenom: 'Camille',
+    email: 'camille.martin@example.com',
+    telephone: '0612345678',
+    adresse: '12 rue des Lilas',
+    code_postal: '69003',
+    ville: 'Lyon'
+  };
+  for (const [key, value] of Object.entries(expected)) {
+    assert.equal(body[`metadata[${key}]`], value, `metadata ${key}`);
+    assert.equal(body[`payment_intent_data[metadata][${key}]`], value, `metadata du paiement ${key}`);
+  }
+  // Limites Stripe : 50 clés, 500 caractères par valeur.
+  const keys = Object.keys(body).filter((key) => key.startsWith('metadata['));
+  assert.ok(keys.length <= 50);
+  keys.forEach((key) => assert.ok(body[key].length <= 500, key));
 });
 
-test('create-payment : la réponse ne contient jamais la clé Mollie', async () => {
-  mockFetch(() => reply(401, { title: 'Unauthorized Request', detail: 'Missing authentication' }));
+test('create-payment : références de commande différentes à chaque commande', async () => {
+  mockFetch(created);
+  await createPayment(post(order()));
+  await createPayment(post(order()));
+  assert.notEqual(calls[0].body['metadata[reference]'], calls[1].body['metadata[reference]']);
+});
+
+test('create-payment : la réponse ne contient jamais la clé Stripe', async () => {
+  mockFetch(() => reply(401, { error: { type: 'invalid_request_error', message: 'Invalid API Key provided: rk_test_****tice' } }));
   const response = await createPayment(post(order()));
   assert.equal(response.statusCode, 502);
-  assert.ok(!response.body.includes('test_cle_mollie_factice'));
+  assert.ok(!response.body.includes('rk_test'));
   assert.equal(JSON.parse(response.body).error, 'paiement_indisponible');
 });
 
-test('create-payment : un montant falsifié est rejeté sans appeler Mollie', async () => {
+test('create-payment : réponse Stripe sans lien de paiement, 502', async () => {
+  mockFetch(() => reply(200, { id: SESSION_ID, url: null }));
+  assert.equal((await createPayment(post(order()))).statusCode, 502);
+});
+
+test('create-payment : un montant falsifié est rejeté sans appeler Stripe', async () => {
   for (const montant of [1, 999, 1399, '1759', null, undefined]) {
     const response = await createPayment(post(order({ montant })));
     assert.equal(response.statusCode, 409, `montant ${montant}`);
     const body = JSON.parse(response.body);
     assert.equal(body.error, 'montant_invalide');
-    assert.equal(body.total, 1399 + catalog.SHIPPING_EUR);
+    assert.equal(body.total, TOTAL);
   }
   assert.equal(calls.length, 0);
 });
 
 test('create-payment : un prix glissé dans la requête est ignoré', async () => {
-  mockFetch(() => reply(201, { id: 'tr_WDqYK6vllg', _links: { checkout: { href: 'https://www.mollie.com/checkout/x' } } }));
-  const response = await createPayment(post(order({ prix: 1, total: 1, amount: { currency: 'EUR', value: '1.00' } })));
+  mockFetch(created);
+  const response = await createPayment(post(order({ prix: 1, total: 1, unit_amount: 100, line_items: [] })));
   assert.equal(response.statusCode, 200);
-  assert.equal(calls[0].body.amount.value, catalog.formatAmount(1399 + catalog.SHIPPING_EUR));
-  assert.equal(calls[0].body.metadata.total, catalog.formatAmount(1399 + catalog.SHIPPING_EUR));
+  assert.equal(calls[0].body['line_items[0][price_data][unit_amount]'], '139900');
+  assert.equal(calls[0].body['metadata[total]'], catalog.formatAmount(TOTAL));
 });
 
 test('create-payment : chaque taille du catalogue est facturée à son prix', async () => {
   for (const modelId of catalog.MODEL_IDS) {
     for (const size of catalog.MODELS[modelId].sizes) {
-      mockFetch(() => reply(201, { id: 'tr_WDqYK6vllg', _links: { checkout: { href: 'https://www.mollie.com/checkout/x' } } }));
+      mockFetch(created);
       const total = size.price + catalog.SHIPPING_EUR;
       const response = await createPayment(post(order({ modele: modelId, taille: size.id, montant: total })));
       assert.equal(response.statusCode, 200, `${modelId} ${size.id}`);
-      assert.equal(calls[0].body.amount.value, catalog.formatAmount(total));
+      const body = calls[0].body;
+      const charged = Number(body['line_items[0][price_data][unit_amount]']) + Number(body['line_items[1][price_data][unit_amount]'] || 0);
+      assert.equal(charged, Math.round(total * 100), `${modelId} ${size.id}`);
     }
   }
 });
@@ -250,14 +304,14 @@ test('create-payment : méthode, origine, JSON et champ piège', async () => {
 });
 
 test('create-payment : SITE_URL personnalise les URL de retour, sinon domaine officiel', async () => {
-  mockFetch(() => reply(201, { id: 'tr_WDqYK6vllg', _links: { checkout: { href: 'https://www.mollie.com/checkout/x' } } }));
+  mockFetch(created);
   process.env.SITE_URL = 'https://apercu--ipoolgofrance.netlify.app/';
   await createPayment(post(order(), { origin: 'https://apercu--ipoolgofrance.netlify.app' }));
-  assert.equal(calls[0].body.redirectUrl, 'https://apercu--ipoolgofrance.netlify.app/merci.html');
+  assert.equal(calls[0].body.success_url, 'https://apercu--ipoolgofrance.netlify.app/merci.html?session_id={CHECKOUT_SESSION_ID}');
 
   process.env.SITE_URL = 'javascript:alert(1)';
   await createPayment(post(order()));
-  assert.equal(calls[1].body.webhookUrl, 'https://ipoolgofrance.fr/.netlify/functions/webhook');
+  assert.match(calls[1].body.cancel_url, /^https:\/\/ipoolgofrance\.fr\/commande\.html\?/);
 });
 
 // ---------------------------------------------------------------- check-payment
@@ -266,49 +320,58 @@ function get(id) {
   return { httpMethod: 'GET', headers: {}, queryStringParameters: id === undefined ? {} : { id } };
 }
 
-test('check-payment : identifiant invalide refusé sans appeler Mollie', async () => {
-  for (const id of [undefined, '', 'abc', 'tr_', 'tr_../../customers', 'tr_abc?x=1', 'tr_abcdef/refunds']) {
+test('check-payment : identifiant invalide refusé sans appeler Stripe', async () => {
+  for (const id of [undefined, '', 'abc', 'cs_', 'cs_live_', 'tr_WDqYK6vllg', 'cs_test_abc/../../customers', 'cs_test_abcdefghij?expand=x', 'pi_3QabcDEFghijkl']) {
     assert.equal((await checkPayment(get(id))).statusCode, 400, String(id));
   }
   assert.equal(calls.length, 0);
 });
 
 test('check-payment : statut et récapitulatif sans donnée personnelle', async () => {
-  for (const status of ['paid', 'canceled', 'failed', 'expired', 'open']) {
-    mockFetch(() => reply(200, paidPayment({ status })));
-    const response = await checkPayment(get('tr_WDqYK6vllg'));
+  const cases = [
+    [{ status: 'complete', payment_status: 'paid' }, 'paid'],
+    [{ status: 'complete', payment_status: 'no_payment_required' }, 'paid'],
+    [{ status: 'complete', payment_status: 'unpaid' }, 'pending'],
+    [{ status: 'open', payment_status: 'unpaid' }, 'open'],
+    [{ status: 'expired', payment_status: 'unpaid' }, 'expired']
+  ];
+  for (const [state, expected] of cases) {
+    mockFetch(() => reply(200, paidSession(Object.assign({ payment_intent: 'pi_3QabcDEF' }, state))));
+    const response = await checkPayment(get(SESSION_ID));
     assert.equal(response.statusCode, 200);
-    assert.equal(calls[0].url, 'https://api.mollie.com/v2/payments/tr_WDqYK6vllg');
-    assert.equal(calls[0].headers.Authorization, 'Bearer test_cle_mollie_factice');
+    assert.equal(calls[0].url, `${STRIPE}/checkout/sessions/${SESSION_ID}`);
+    assert.equal(calls[0].headers.Authorization, 'Bearer rk_test_cle_stripe_factice');
     const body = JSON.parse(response.body);
-    assert.equal(body.status, status);
+    assert.equal(body.status, expected, JSON.stringify(state));
+    assert.equal(body.commande.reference, 'IPG-261119-ABCDE');
     assert.equal(body.commande.produit, 'Piscine iPoolGo Ronde Ø 3 m × 1,20 m');
-    assert.equal(body.commande.total, catalog.formatAmount(1399 + catalog.SHIPPING_EUR));
+    assert.equal(body.commande.total, catalog.formatAmount(TOTAL));
+    assert.equal(body.commande.devise, 'EUR');
     for (const secret of ['Martin', 'Camille', 'example.com', '0612345678', 'Lilas', '69003', 'Lyon']) {
       assert.ok(!response.body.includes(secret), `fuite de ${secret}`);
     }
   }
 });
 
-test('check-payment : paiement inconnu ou étranger au site', async () => {
-  mockFetch(() => reply(404, { title: 'Not Found' }));
-  assert.equal((await checkPayment(get('tr_WDqYK6vllg'))).statusCode, 404);
+test('check-payment : session inconnue ou étrangère au site', async () => {
+  mockFetch(() => reply(404, { error: { code: 'resource_missing' } }));
+  assert.equal((await checkPayment(get(SESSION_ID))).statusCode, 404);
 
-  mockFetch(() => reply(200, paidPayment({ metadata: { order_id: '42' } })));
-  assert.equal((await checkPayment(get('tr_WDqYK6vllg'))).statusCode, 404);
+  mockFetch(() => reply(200, paidSession({ metadata: { order_id: '42' } })));
+  assert.equal((await checkPayment(get(SESSION_ID))).statusCode, 404);
 
   mockFetch(() => reply(503, {}));
-  assert.equal((await checkPayment(get('tr_WDqYK6vllg'))).statusCode, 502);
+  assert.equal((await checkPayment(get(SESSION_ID))).statusCode, 502);
 
   assert.equal((await checkPayment({ httpMethod: 'POST', headers: {} })).statusCode, 405);
 });
 
 // ---------------------------------------------------------------- webhook
 
-function mollieAndBrevo(payment, brevoStatus) {
+function stripeAndBrevo(session, brevoStatus) {
   mockFetch((call) => {
-    if (call.url.startsWith('https://api.mollie.com/')) return reply(200, payment);
-    if (call.url === 'https://api.brevo.com/v3/smtp/email') {
+    if (call.url.startsWith(STRIPE)) return reply(200, call.method === 'GET' ? session : { id: 'pi_3QabcDEF' });
+    if (call.url === BREVO) {
       const status = typeof brevoStatus === 'function' ? brevoStatus(call) : brevoStatus || 201;
       return reply(status, status === 201 ? { messageId: '<id@smtp-relay.mailin.fr>' } : { code: 'unauthorized', message: 'Key not found' });
     }
@@ -317,17 +380,17 @@ function mollieAndBrevo(payment, brevoStatus) {
 }
 
 function brevoCalls() {
-  return calls.filter((call) => call.url === 'https://api.brevo.com/v3/smtp/email');
+  return calls.filter((call) => call.url === BREVO);
 }
 
-test('webhook : paiement payé, vérifié chez Mollie puis deux e-mails Brevo', async () => {
-  mollieAndBrevo(paidPayment());
-  const response = await webhook(mollieWebhook('id=tr_WDqYK6vllg'));
+test('webhook : paiement payé, vérifié chez Stripe puis deux e-mails Brevo', async () => {
+  stripeAndBrevo(paidSession());
+  const response = await webhook(hook(stripeEvent(SESSION_ID)));
   assert.equal(response.statusCode, 200);
 
   assert.equal(calls[0].method, 'GET');
-  assert.equal(calls[0].url, 'https://api.mollie.com/v2/payments/tr_WDqYK6vllg');
-  assert.equal(calls[0].headers.Authorization, 'Bearer test_cle_mollie_factice');
+  assert.equal(calls[0].url, `${STRIPE}/checkout/sessions/${SESSION_ID}?expand[]=payment_intent.latest_charge`);
+  assert.equal(calls[0].headers.Authorization, 'Bearer rk_test_cle_stripe_factice');
 
   const [seller, customer] = brevoCalls();
   assert.equal(brevoCalls().length, 2);
@@ -343,125 +406,159 @@ test('webhook : paiement payé, vérifié chez Mollie puis deux e-mails Brevo', 
   assert.deepEqual(seller.body.to, [{ email: 'vendeur@example.com' }]);
   assert.match(seller.body.subject, /^Nouvelle commande iPoolGo France payée/);
   assert.equal(seller.body.replyTo.email, 'camille.martin@example.com');
-  for (const expected of ['tr_WDqYK6vllg', 'Piscine iPoolGo Ronde', 'Ø 3 m × 1,20 m', '12 rue des Lilas', '69003 Lyon', '0612345678']) {
+  for (const expected of ['IPG-261119-ABCDE', SESSION_ID, 'Piscine iPoolGo Ronde', 'Ø 3 m × 1,20 m', '12 rue des Lilas', '69003 Lyon', '0612345678']) {
     assert.ok(seller.body.htmlContent.includes(expected), `e-mail vendeur sans ${expected}`);
   }
-  assert.ok(seller.body.htmlContent.includes(catalog.formatEUR(1399 + catalog.SHIPPING_EUR)));
+  assert.ok(seller.body.htmlContent.includes(catalog.formatEUR(TOTAL)));
   assert.ok(!seller.body.htmlContent.includes('Attention'));
 
   assert.equal(customer.body.to[0].email, 'camille.martin@example.com');
   assert.equal(customer.body.replyTo.email, 'vendeur@example.com');
+  assert.ok(customer.body.htmlContent.includes('IPG-261119-ABCDE'));
+  assert.ok(!customer.body.htmlContent.includes(SESSION_ID), 'le client voit la référence courte');
   for (const expected of ['Pompe de gonflage électrique', 'Système de filtration à sable', 'Offert', 'SAS Virage', 'garantie légale de conformité de 2 ans', 'contact@piscineipoolgo.com']) {
     assert.ok(customer.body.htmlContent.includes(expected), `e-mail client sans ${expected}`);
   }
 
-  const patch = calls[calls.length - 1];
-  assert.equal(patch.method, 'PATCH');
-  assert.equal(patch.url, 'https://api.mollie.com/v2/payments/tr_WDqYK6vllg');
-  assert.ok(patch.body.metadata.mail_vendeur);
-  assert.ok(patch.body.metadata.mail_client);
-  assert.equal(patch.body.metadata.email, 'camille.martin@example.com');
+  const mark = calls[calls.length - 1];
+  assert.equal(mark.method, 'POST');
+  assert.equal(mark.url, `${STRIPE}/payment_intents/pi_3QabcDEF`);
+  assert.ok(mark.body['metadata[mail_vendeur]']);
+  assert.ok(mark.body['metadata[mail_client]']);
+  assert.equal(Object.keys(mark.body).length, 2, 'seuls les marqueurs sont envoyés, Stripe fusionne');
 });
 
-test('webhook : accepte aussi un corps JSON', async () => {
-  mollieAndBrevo(paidPayment());
-  const response = await webhook(mollieWebhook(JSON.stringify({ id: 'tr_WDqYK6vllg' }), 'application/json'));
-  assert.equal(response.statusCode, 200);
+test('webhook : paiement différé confirmé (async_payment_succeeded)', async () => {
+  stripeAndBrevo(paidSession());
+  assert.equal((await webhook(hook(stripeEvent(SESSION_ID, 'checkout.session.async_payment_succeeded')))).statusCode, 200);
   assert.equal(brevoCalls().length, 2);
 });
 
 test('webhook : corps encodé en base64 par la passerelle', async () => {
-  mollieAndBrevo(paidPayment());
-  const event = mollieWebhook(Buffer.from('id=tr_WDqYK6vllg').toString('base64'));
+  stripeAndBrevo(paidSession());
+  const event = hook(Buffer.from(stripeEvent(SESSION_ID)).toString('base64'));
   event.isBase64Encoded = true;
   assert.equal((await webhook(event)).statusCode, 200);
   assert.equal(brevoCalls().length, 2);
 });
 
-test('webhook : usurpation, un statut "paid" annoncé dans la requête ne déclenche rien', async () => {
-  for (const status of ['open', 'pending', 'authorized', 'canceled', 'expired', 'failed']) {
-    mollieAndBrevo(paidPayment({ status }));
-    const forged = JSON.stringify({ id: 'tr_WDqYK6vllg', status: 'paid', amount: { value: '0.01' } });
-    const response = await webhook(mollieWebhook(forged, 'application/json'));
-    assert.equal(response.statusCode, 200, status);
-    assert.equal(calls.length, 1, 'seule la vérification Mollie doit partir');
+test('webhook : usurpation, un paiement "paid" annoncé dans la requête ne déclenche rien', async () => {
+  const states = [
+    { status: 'open', payment_status: 'unpaid' },
+    { status: 'complete', payment_status: 'unpaid' },
+    { status: 'expired', payment_status: 'unpaid' }
+  ];
+  for (const state of states) {
+    stripeAndBrevo(paidSession(state));
+    const forged = JSON.stringify({
+      type: 'checkout.session.completed',
+      data: { object: { id: SESSION_ID, object: 'checkout.session', status: 'complete', payment_status: 'paid', amount_total: 1 } }
+    });
+    const response = await webhook(hook(forged));
+    assert.equal(response.statusCode, 200, JSON.stringify(state));
+    assert.equal(calls.length, 1, 'seule la vérification Stripe doit partir');
     assert.equal(calls[0].method, 'GET');
   }
 });
 
 test('webhook : identifiant absent ou malformé, 200 sans aucun appel', async () => {
-  for (const body of ['', 'id=', 'id=abc', 'id=tr_../../refunds', 'foo=bar', '{"id":{"$ne":1}}', '{cassé']) {
-    assert.equal((await webhook(mollieWebhook(body))).statusCode, 200, body);
+  const bodies = [
+    '',
+    '{cassé',
+    'id=cs_test_a1B2c3D4e5F6g7H8i9J0kLmNoPq',
+    JSON.stringify({ data: { object: { id: SESSION_ID, object: 'payment_intent' } } }),
+    JSON.stringify({ data: { object: { id: 'cs_test_abc/../../x', object: 'checkout.session' } } }),
+    JSON.stringify({ data: { object: { id: { $ne: 1 }, object: 'checkout.session' } } }),
+    JSON.stringify({ id: SESSION_ID })
+  ];
+  for (const body of bodies) {
+    assert.equal((await webhook(hook(body))).statusCode, 200, body);
   }
   assert.equal(calls.length, 0);
 });
 
-test('webhook : paiement inconnu chez Mollie, 200 sans e-mail', async () => {
-  mockFetch(() => reply(404, { title: 'Not Found' }));
-  assert.equal((await webhook(mollieWebhook('id=tr_WDqYK6vllg'))).statusCode, 200);
+test('webhook : signature vérifiée quand STRIPE_WEBHOOK_SECRET est définie', async () => {
+  process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_secret_factice';
+  const body = stripeEvent(SESSION_ID);
+  const sign = (timestamp, secret) =>
+    `t=${timestamp},v1=${crypto.createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex')}`;
+  const now = Math.floor(Date.now() / 1000);
+
+  for (const signature of ['', 't=1,v1=abc', sign(now, 'whsec_autre'), sign(now - 3600, 'whsec_test_secret_factice')]) {
+    assert.equal((await webhook(hook(body, { 'stripe-signature': signature }))).statusCode, 400, signature);
+  }
+  assert.equal(calls.length, 0);
+
+  stripeAndBrevo(paidSession());
+  assert.equal((await webhook(hook(body, { 'Stripe-Signature': sign(now, 'whsec_test_secret_factice') }))).statusCode, 200);
+  assert.equal(brevoCalls().length, 2);
+});
+
+test('webhook : session inconnue chez Stripe, 200 sans e-mail', async () => {
+  mockFetch(() => reply(404, { error: { code: 'resource_missing' } }));
+  assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 200);
   assert.equal(calls.length, 1);
 });
 
-test('webhook : Mollie injoignable, 500 pour que Mollie rappelle', async () => {
+test('webhook : Stripe injoignable, 500 pour que Stripe rappelle', async () => {
   mockFetch(() => reply(503, {}));
-  assert.equal((await webhook(mollieWebhook('id=tr_WDqYK6vllg'))).statusCode, 500);
+  assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 500);
 
   mockFetch(() => {
     throw new Error('timeout');
   });
-  assert.equal((await webhook(mollieWebhook('id=tr_WDqYK6vllg'))).statusCode, 500);
+  assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 500);
 });
 
-test('webhook : paiement d’un autre site ou remboursé, rien n’est envoyé', async () => {
-  mollieAndBrevo(paidPayment({ metadata: { order_id: '42' } }));
-  assert.equal((await webhook(mollieWebhook('id=tr_WDqYK6vllg'))).statusCode, 200);
-  assert.equal(brevoCalls().length, 0);
-
-  mollieAndBrevo(paidPayment({ amountRefunded: { currency: 'EUR', value: '1759.00' } }));
-  assert.equal((await webhook(mollieWebhook('id=tr_WDqYK6vllg'))).statusCode, 200);
-  assert.equal(brevoCalls().length, 0);
+test('webhook : paiement d’un autre site, remboursé ou contesté, rien n’est envoyé', async () => {
+  const cases = [
+    paidSession({ metadata: { order_id: '42' } }),
+    paidSession({}, {}, { amount_refunded: TOTAL * 100 }),
+    paidSession({}, {}, { disputed: true }),
+    paidSession({ payment_intent: null })
+  ];
+  for (const session of cases) {
+    stripeAndBrevo(session);
+    assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 200);
+    assert.equal(brevoCalls().length, 0);
+  }
 });
 
 test('webhook : e-mails déjà envoyés, aucun doublon', async () => {
-  const payment = paidPayment();
-  payment.metadata.mail_vendeur = '2026-06-01T10:00:00.000Z';
-  payment.metadata.mail_client = '2026-06-01T10:00:01.000Z';
-  mollieAndBrevo(payment);
-  assert.equal((await webhook(mollieWebhook('id=tr_WDqYK6vllg'))).statusCode, 200);
+  stripeAndBrevo(paidSession({}, { mail_vendeur: '2026-06-01T10:00:00.000Z', mail_client: '2026-06-01T10:00:01.000Z' }));
+  assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 200);
   assert.equal(calls.length, 1);
 });
 
 test('webhook : un e-mail en échec, 500 et seul l’envoi réussi est marqué', async () => {
-  mollieAndBrevo(paidPayment(), (call) => (call.body.to[0].email === 'vendeur@example.com' ? 201 : 401));
-  const response = await webhook(mollieWebhook('id=tr_WDqYK6vllg'));
+  stripeAndBrevo(paidSession(), (call) => (call.body.to[0].email === 'vendeur@example.com' ? 201 : 401));
+  const response = await webhook(hook(stripeEvent(SESSION_ID)));
   assert.equal(response.statusCode, 500);
-  const patch = calls[calls.length - 1];
-  assert.equal(patch.method, 'PATCH');
-  assert.ok(patch.body.metadata.mail_vendeur);
-  assert.equal(patch.body.metadata.mail_client, undefined);
+  const mark = calls[calls.length - 1];
+  assert.equal(mark.url, `${STRIPE}/payment_intents/pi_3QabcDEF`);
+  assert.ok(mark.body['metadata[mail_vendeur]']);
+  assert.equal(mark.body['metadata[mail_client]'], undefined);
 
-  // Rappel de Mollie : seul l'e-mail client repart.
-  const retried = paidPayment();
-  retried.metadata.mail_vendeur = patch.body.metadata.mail_vendeur;
-  mollieAndBrevo(retried);
-  assert.equal((await webhook(mollieWebhook('id=tr_WDqYK6vllg'))).statusCode, 200);
+  // Rappel de Stripe : seul l'e-mail client repart.
+  stripeAndBrevo(paidSession({}, { mail_vendeur: mark.body['metadata[mail_vendeur]'] }));
+  assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 200);
   assert.equal(brevoCalls().length, 1);
   assert.equal(brevoCalls()[0].body.to[0].email, 'camille.martin@example.com');
 });
 
 test('webhook : configuration Brevo incomplète, 500 sans envoi', async () => {
   delete process.env.SELLER_EMAIL;
-  mollieAndBrevo(paidPayment());
-  assert.equal((await webhook(mollieWebhook('id=tr_WDqYK6vllg'))).statusCode, 500);
+  stripeAndBrevo(paidSession());
+  assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 500);
   assert.equal(brevoCalls().length, 0);
 });
 
 test('webhook : les champs saisis sont échappés dans les e-mails', async () => {
-  const payment = paidPayment();
-  payment.metadata.nom = '<script>alert(1)</script>';
-  payment.metadata.adresse = '1 rue "A" <img src=x onerror=alert(1)>';
-  mollieAndBrevo(payment);
-  await webhook(mollieWebhook('id=tr_WDqYK6vllg'));
+  const session = paidSession();
+  session.metadata.nom = '<script>alert(1)</script>';
+  session.metadata.adresse = '1 rue "A" <img src=x onerror=alert(1)>';
+  stripeAndBrevo(session);
+  await webhook(hook(stripeEvent(SESSION_ID)));
   for (const mail of brevoCalls()) {
     assert.ok(!mail.body.htmlContent.includes('<script>'));
     assert.ok(!mail.body.htmlContent.includes('<img'));
@@ -470,22 +567,22 @@ test('webhook : les champs saisis sont échappés dans les e-mails', async () =>
 });
 
 test('webhook : montant encaissé différent du catalogue, le vendeur est alerté', async () => {
-  mollieAndBrevo(paidPayment({ amount: { currency: 'EUR', value: '1.00' } }));
-  await webhook(mollieWebhook('id=tr_WDqYK6vllg'));
+  stripeAndBrevo(paidSession({ amount_total: 100 }));
+  await webhook(hook(stripeEvent(SESSION_ID)));
   assert.ok(brevoCalls()[0].body.htmlContent.includes('Attention'));
 
-  mollieAndBrevo(paidPayment({ amount: { currency: 'USD', value: catalog.formatAmount(1399 + catalog.SHIPPING_EUR) } }));
-  await webhook(mollieWebhook('id=tr_WDqYK6vllg'));
+  stripeAndBrevo(paidSession({ currency: 'usd' }));
+  await webhook(hook(stripeEvent(SESSION_ID)));
   assert.ok(brevoCalls()[0].body.htmlContent.includes('Attention'));
 });
 
-test('webhook : marquage Mollie en échec, les e-mails sont partis et la réponse reste 200', async () => {
+test('webhook : marquage Stripe en échec, les e-mails sont partis et la réponse reste 200', async () => {
   mockFetch((call) => {
-    if (call.method === 'PATCH') return reply(503, {});
-    if (call.url.startsWith('https://api.mollie.com/')) return reply(200, paidPayment());
+    if (call.url.startsWith(`${STRIPE}/payment_intents/`)) return reply(503, {});
+    if (call.url.startsWith(STRIPE)) return reply(200, paidSession());
     return reply(201, { messageId: '<id@smtp-relay.mailin.fr>' });
   });
-  assert.equal((await webhook(mollieWebhook('id=tr_WDqYK6vllg'))).statusCode, 200);
+  assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 200);
   assert.equal(brevoCalls().length, 2);
 });
 

@@ -1,10 +1,10 @@
 'use strict';
 
-// GET /.netlify/functions/check-payment?id=tr_xxx
-// Renvoie le statut Mollie et un récapitulatif sans donnée personnelle
+// GET /.netlify/functions/check-payment?id=cs_xxx
+// Renvoie le statut de la session Stripe et un récapitulatif sans donnée personnelle
 // (ni nom, ni e-mail, ni adresse) pour la page merci.html.
 
-const { ORDER_SOURCE, ApiError, json, isPaymentId, mollie } = require('../lib/shared.js');
+const { ORDER_SOURCE, ApiError, json, isPaymentId, stripe, toPayment } = require('../lib/shared.js');
 
 exports.handler = async function handler(event) {
   if (event.httpMethod !== 'GET') {
@@ -18,16 +18,16 @@ exports.handler = async function handler(event) {
 
   let payment;
   try {
-    payment = await mollie('GET', `/payments/${id}`);
+    payment = toPayment(await stripe('GET', `/checkout/sessions/${id}`));
   } catch (error) {
-    if (error instanceof ApiError && (error.status === 404 || error.status === 410)) {
+    if (error instanceof ApiError && error.status === 404) {
       return json(404, { error: 'paiement_introuvable' });
     }
     console.error('check-payment :', error.message);
     return json(502, { error: 'verification_indisponible' });
   }
 
-  const metadata = payment.metadata || {};
+  const metadata = payment.metadata;
   if (metadata.source !== ORDER_SOURCE) {
     return json(404, { error: 'paiement_introuvable' });
   }
@@ -35,13 +35,14 @@ exports.handler = async function handler(event) {
   return json(200, {
     status: payment.status,
     commande: {
+      reference: metadata.reference,
       modele: metadata.modele,
       taille: metadata.taille,
       produit: metadata.produit,
       prix: metadata.prix,
       livraison: metadata.livraison,
-      total: payment.amount && payment.amount.value,
-      devise: payment.amount && payment.amount.currency
+      total: payment.amount.value,
+      devise: payment.amount.currency
     }
   });
 };

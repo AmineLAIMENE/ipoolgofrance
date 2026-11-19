@@ -532,13 +532,13 @@ test('aucun secret dans le dépôt, aucune clé ni API de paiement côté naviga
   assert.ok(!files.some((file) => file.startsWith('node_modules/')), 'aucun node_modules');
 
   const patterns = [
-    [/\b(live|test)_[A-Za-z0-9]{30,}\b/, 'clé API Mollie'],
     [/xkeysib-[a-f0-9]{20,}/i, 'clé API Brevo'],
     [/xsmtpsib-[a-f0-9]{20,}/i, 'clé SMTP Brevo'],
     [/gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}/, 'jeton GitHub'],
     [/-----BEGIN [A-Z ]*PRIVATE KEY-----/, 'clé privée'],
     [/AKIA[0-9A-Z]{16}/, 'clé AWS'],
-    [/sk_(live|test)_[A-Za-z0-9]{20,}/, 'clé Stripe']
+    [/\b(sk|rk)_(live|test)_[A-Za-z0-9]{20,}/, 'clé secrète Stripe'],
+    [/whsec_[A-Za-z0-9]{20,}/, 'secret de webhook Stripe']
   ];
   files.filter((file) => TEXT_FILE.test(file) && !file.startsWith('tests/')).forEach((file) => {
     const content = read(file);
@@ -548,14 +548,14 @@ test('aucun secret dans le dépôt, aucune clé ni API de paiement côté naviga
   });
 
   const env = read('.env.example');
-  ['MOLLIE_API_KEY', 'BREVO_API_KEY', 'SELLER_EMAIL', 'SENDER_EMAIL'].forEach((name) => {
+  ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'BREVO_API_KEY', 'SELLER_EMAIL', 'SENDER_EMAIL'].forEach((name) => {
     assert.match(env, new RegExp(`^${name}=$`, 'm'), `.env.example : ${name} doit être listée sans valeur`);
   });
 
   const front = ALL_HTML.concat(['assets/js/app.js', 'assets/js/catalog.js', 'assets/css/style.css']);
   front.forEach((file) => {
     const content = read(file);
-    assert.ok(!/MOLLIE_API_KEY|BREVO_API_KEY|api\.mollie\.com|api\.brevo\.com|Bearer |api-key/i.test(content), `${file} : référence à une clé ou à une API privée côté navigateur`);
+    assert.ok(!/STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|BREVO_API_KEY|api\.stripe\.com|api\.brevo\.com|Bearer |api-key|\b(sk|rk)_(live|test)_/i.test(content), `${file} : référence à une clé ou à une API privée côté navigateur`);
   });
 
   const ignore = read('.gitignore');
