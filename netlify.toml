@@ -50,6 +50,87 @@
   status = 301
   force = true
 
+# Une seule adresse par page : sans « .html » (Netlify sert le fichier .html correspondant).
+# commande.html et merci.html (noindex, liens générés en JavaScript et par Stripe) gardent leur extension.
+[[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/piscine-ronde-ipoolgo.html"
+  to = "/piscine-ronde-ipoolgo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/piscine-rectangulaire-ipoolgo.html"
+  to = "/piscine-rectangulaire-ipoolgo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/comparatif-piscine-ipoolgo.html"
+  to = "/comparatif-piscine-ipoolgo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/qui-sommes-nous.html"
+  to = "/qui-sommes-nous"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/cgv.html"
+  to = "/cgv"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/mentions-legales.html"
+  to = "/mentions-legales"
+  status = 301
+  force = true
+
+# Anciennes adresses du site Next.js, encore connues de Google.
+[[redirects]]
+  from = "/fr/produits/piscine-ronde"
+  to = "/piscine-ronde-ipoolgo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/fr/produits/piscine-rectangulaire"
+  to = "/piscine-rectangulaire-ipoolgo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/fr/*"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/fr"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/*"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en"
+  to = "/"
+  status = 301
+  force = true
+
 # Fichiers du dépôt qui n'ont pas à être servis au public.
 [[redirects]]
   from = "/netlify/*"

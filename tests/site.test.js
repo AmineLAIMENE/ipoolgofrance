@@ -29,6 +29,11 @@ const PAGES = [
 ];
 const NOINDEX = ['commande.html', 'merci.html', '404.html'];
 const ALL_HTML = PAGES.concat(['404.html']);
+// Adresse publique d'une page : sans « .html » (301 dans netlify.toml), sauf les pages hors index.
+const pageUrl = (file) =>
+  file === 'index.html' ? `${SITE}/` : NOINDEX.includes(file) ? `${SITE}/${file}` : `${SITE}/${file.replace(/\.html$/, '')}`;
+// Fichier servi pour un chemin public.
+const fileOf = (pathname) => (pathname === '/' ? 'index.html' : /\.[a-z]+$/.test(pathname) ? pathname.slice(1) : `${pathname.slice(1)}.html`);
 const SIZE_COUNT = catalog.MODEL_IDS.reduce((sum, id) => sum + catalog.MODELS[id].sizes.length, 0);
 
 const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
@@ -148,7 +153,7 @@ test('chaque page a une canonique sur https://ipoolgofrance.fr et la bonne direc
     const source = html[file];
     const canonicals = all(source, /<link rel="canonical" href="([^"]+)">/);
     assert.equal(canonicals.length, 1, `${file} : une seule canonique`);
-    const expected = file === 'index.html' ? `${SITE}/` : `${SITE}/${file}`;
+    const expected = pageUrl(file);
     assert.equal(canonicals[0][1], expected, `${file} : canonique`);
     assert.equal(/<meta property="og:url" content="([^"]+)">/.exec(source)[1], expected, `${file} : og:url`);
 
@@ -274,7 +279,7 @@ test('JSON-LD : Organization/Store (SAS Virage), Product + Offer + AggregateRati
 
   catalog.MODEL_IDS.forEach((id) => {
     const model = catalog.MODELS[id];
-    const file = model.page.slice(1);
+    const file = fileOf(model.page);
     [file].forEach((page) => {
       // ProductGroup est un sous-type de Product : une variante Product + Offer par taille.
       const product = nodesOfType(page, 'ProductGroup').find((node) => node.productGroupID === model.sku);
@@ -344,7 +349,7 @@ test('les prix « dès … € » des balises meta correspondent au catalogue', 
   catalog.MODEL_IDS.forEach((id) => {
     const model = catalog.MODELS[id];
     const min = Math.min(...model.sizes.map((size) => size.price));
-    const source = html[model.page.slice(1)];
+    const source = html[fileOf(model.page)];
     all(source, /<meta (?:name|property)="[^"]*(?:description|title)" content="([^"]+)">/).forEach((m) => {
       const price = /dès ([\d\s\u00a0\u202f]+)\s?€/.exec(decode(m[1]));
       if (price) assert.equal(Number(price[1].replace(/\D/g, '')), min, `${model.page} : prix d'appel`);
@@ -375,7 +380,9 @@ test('google-shopping.xml : RSS 2.0 bien formé, une entrée par modèle et par 
       const item = items.find((entry) => field(entry, 'id') === `${model.sku}-${size.id}`);
       assert.ok(item, `entrée ${model.sku}-${size.id}`);
       seen.add(field(item, 'id'));
-      assert.match(field(item, 'title'), new RegExp(`^Piscine Gonflable Rigide iPoolGo ${model.shortName} .+ - Pompe Offerte$`));
+      assert.match(field(item, 'title'), new RegExp(`^Piscine gonflable rigide iPoolGo ${model.shortName} .+ en Drop-Stitch$`));
+      assert.ok(!/offert/i.test(field(item, 'title')), 'pas de texte promotionnel dans le titre');
+      assert.equal(all(item, /<g:product_highlight>/).length, catalog.GIFTS.length, 'cadeaux en product_highlight');
       assert.ok(field(item, 'title').length <= 150, 'titre de 150 caractères au plus');
       assert.match(field(item, 'description'), /offerts/);
       assert.equal(field(item, 'price'), `${size.price.toFixed(2)} EUR`);
@@ -386,7 +393,7 @@ test('google-shopping.xml : RSS 2.0 bien formé, une entrée par modèle et par 
 
       const link = new URL(field(item, 'link'));
       assert.equal(link.origin, SITE);
-      assert.ok(exists(link.pathname === '/' ? 'index.html' : link.pathname.slice(1)), `page ${link.pathname}`);
+      assert.ok(exists(fileOf(link.pathname)), `page ${link.pathname}`);
       assert.equal(link.searchParams.get('taille'), size.id, 'le lien présélectionne la taille');
       if (link.pathname === '/') assert.equal(link.searchParams.get('modele'), id);
       else assert.equal(link.pathname, model.page);
@@ -408,7 +415,7 @@ test('sitemap.xml : bien formé, pages indexables uniquement, URL canoniques', (
   const xml = read('sitemap.xml');
   assertWellFormedXml(xml, 'sitemap.xml');
   const urls = all(xml, /<loc>([^<]+)<\/loc>/).map((m) => m[1]);
-  const expected = PAGES.filter((file) => !NOINDEX.includes(file)).map((file) => (file === 'index.html' ? `${SITE}/` : `${SITE}/${file}`));
+  const expected = PAGES.filter((file) => !NOINDEX.includes(file)).map(pageUrl);
   assert.deepEqual(urls.slice().sort(), expected.slice().sort());
   all(xml, /<lastmod>([^<]+)<\/lastmod>/).forEach((m) => assert.match(m[1], /^\d{4}-\d{2}-\d{2}$/));
 });
@@ -434,7 +441,7 @@ test('llms.txt : présent, structuré et à jour des prix', () => {
   });
   all(llms, /\]\((https:\/\/ipoolgofrance\.fr[^)]*)\)/).forEach((m) => {
     const pathname = new URL(m[1]).pathname;
-    assert.ok(exists(pathname === '/' ? 'index.html' : pathname.slice(1)), `llms.txt : ${m[1]}`);
+    assert.ok(exists(fileOf(pathname)), `llms.txt : ${m[1]}`);
   });
 });
 

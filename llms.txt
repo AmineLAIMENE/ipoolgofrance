@@ -7,38 +7,38 @@ Site en français. Prix TTC en euros. Livraison en France métropolitaine unique
 ## Pages
 
 - [Accueil](https://ipoolgofrance.fr/): les deux modèles, leurs prix et les avis d'acheteurs.
-- [Commande](https://ipoolgofrance.fr/commande.html): choix de la forme et de la taille, total, choix obligatoire entre livraison et retrait gratuit au dépôt, coordonnées et paiement en ligne (Stripe).
-- [Piscine iPoolGo Ronde](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html): 9 tailles de Ø 2 m à Ø 6 m, fiche technique, installation, entretien, questions fréquentes.
-- [Piscine iPoolGo Rectangulaire](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html): 8 formats de 2 × 2 m à 6 × 5 m, fiche technique, installation sur terrasse, questions fréquentes.
-- [Comparatif des piscines hors-sol](https://ipoolgofrance.fr/comparatif-piscine-ipoolgo.html): Drop-Stitch, autoportante à boudin et tubulaire comparées (montage, parois, prix, rangement, réglementation), avec les sources.
-- [Conditions Générales de Vente](https://ipoolgofrance.fr/cgv.html): prix, paiement, livraison, rétractation sous 14 jours, garanties légales.
-- [Mentions légales et confidentialité](https://ipoolgofrance.fr/mentions-legales.html): éditeur, hébergeur, données personnelles, cookies.
+- [Commande](https://ipoolgofrance.fr/commande): choix de la forme et de la taille, total, choix obligatoire entre livraison et retrait gratuit au dépôt, coordonnées et paiement en ligne (Stripe).
+- [Piscine iPoolGo Ronde](https://ipoolgofrance.fr/piscine-ronde-ipoolgo): 9 tailles de Ø 2 m à Ø 6 m, fiche technique, installation, entretien, questions fréquentes.
+- [Piscine iPoolGo Rectangulaire](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo): 8 formats de 2 × 2 m à 6 × 5 m, fiche technique, installation sur terrasse, questions fréquentes.
+- [Comparatif des piscines hors-sol](https://ipoolgofrance.fr/comparatif-piscine-ipoolgo): Drop-Stitch, autoportante à boudin et tubulaire comparées (montage, parois, prix, rangement, réglementation), avec les sources.
+- [Conditions Générales de Vente](https://ipoolgofrance.fr/cgv): prix, paiement, livraison, rétractation sous 14 jours, garanties légales.
+- [Mentions légales et confidentialité](https://ipoolgofrance.fr/mentions-legales): éditeur, hébergeur, données personnelles, cookies.
 
 ## Prix et tailles
 
 <!-- catalog:prix-llms -->
 ### Piscine iPoolGo Ronde (9 tailles)
 
-- Ø 2 m × 1 m : 999.00 EUR TTC, 1 à 2 personnes, environ 2800 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=200x100)
-- Ø 3 m × 1,20 m : 1399.00 EUR TTC, 2 à 3 personnes, environ 7600 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=300x120)
-- Ø 3 m × 1,50 m : 1599.00 EUR TTC, 2 à 3 personnes, environ 9500 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=300x150)
-- Ø 3,7 m × 1,20 m : 1699.00 EUR TTC, 3 à 4 personnes, environ 11500 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=370x120)
-- Ø 4 m × 1,20 m : 1899.00 EUR TTC, 4 à 5 personnes, environ 13300 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=400x120)
-- Ø 4 m × 1,50 m : 2000.00 EUR TTC, 5 à 6 personnes, environ 17000 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=400x150)
-- Ø 5 m × 1,20 m : 2200.00 EUR TTC, 5 à 7 personnes, environ 20700 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=500x120)
-- Ø 5 m × 1,50 m : 2600.00 EUR TTC, 6 à 7 personnes, environ 26000 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=500x150)
-- Ø 6 m × 1,50 m : 3400.00 EUR TTC, 8 à 10 personnes, environ 37300 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html?taille=600x150)
+- Ø 2 m × 1 m : 999.00 EUR TTC, 1 à 2 personnes, environ 2800 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo?taille=200x100)
+- Ø 3 m × 1,20 m : 1399.00 EUR TTC, 2 à 3 personnes, environ 7600 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo?taille=300x120)
+- Ø 3 m × 1,50 m : 1599.00 EUR TTC, 2 à 3 personnes, environ 9500 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo?taille=300x150)
+- Ø 3,7 m × 1,20 m : 1699.00 EUR TTC, 3 à 4 personnes, environ 11500 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo?taille=370x120)
+- Ø 4 m × 1,20 m : 1899.00 EUR TTC, 4 à 5 personnes, environ 13300 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo?taille=400x120)
+- Ø 4 m × 1,50 m : 2000.00 EUR TTC, 5 à 6 personnes, environ 17000 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo?taille=400x150)
+- Ø 5 m × 1,20 m : 2200.00 EUR TTC, 5 à 7 personnes, environ 20700 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo?taille=500x120)
+- Ø 5 m × 1,50 m : 2600.00 EUR TTC, 6 à 7 personnes, environ 26000 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo?taille=500x150)
+- Ø 6 m × 1,50 m : 3400.00 EUR TTC, 8 à 10 personnes, environ 37300 litres. [Commander](https://ipoolgofrance.fr/piscine-ronde-ipoolgo?taille=600x150)
 
 ### Piscine iPoolGo Rectangulaire (8 tailles)
 
-- Compact, 2 × 2 × 1,20 m : 1599.00 EUR TTC, 2 à 3 personnes, environ 4200 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=200x200)
-- Family, 3 × 2 × 1,20 m : 1999.00 EUR TTC, 2 à 4 personnes, environ 6500 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=300x200)
-- Lane, 4 × 3 × 1,20 m : 2999.00 EUR TTC, 4 à 5 personnes, environ 12600 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=400x300)
-- Square, 4 × 4 × 1,20 m : 3490.00 EUR TTC, 6 à 8 personnes, environ 16900 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=400x400)
-- Lounge, 5 × 4 × 1,20 m : 4490.00 EUR TTC, jusqu'à 8 personnes, environ 21100 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=500x400)
-- Swim, 6 × 3 × 1,20 m : 4200.00 EUR TTC, 7 à 9 personnes, environ 19000 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=600x300)
-- Family Plus, 6 × 4 × 1,20 m : 4999.00 EUR TTC, 8 à 10 personnes, environ 25500 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=600x400)
-- Resort, 6 × 5 × 1,20 m : 5500.00 EUR TTC, 10 à 12 personnes, environ 31700 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=600x500)
+- Compact, 2 × 2 × 1,20 m : 1599.00 EUR TTC, 2 à 3 personnes, environ 4200 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo?taille=200x200)
+- Family, 3 × 2 × 1,20 m : 1999.00 EUR TTC, 2 à 4 personnes, environ 6500 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo?taille=300x200)
+- Lane, 4 × 3 × 1,20 m : 2999.00 EUR TTC, 4 à 5 personnes, environ 12600 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo?taille=400x300)
+- Square, 4 × 4 × 1,20 m : 3490.00 EUR TTC, 6 à 8 personnes, environ 16900 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo?taille=400x400)
+- Lounge, 5 × 4 × 1,20 m : 4490.00 EUR TTC, jusqu'à 8 personnes, environ 21100 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo?taille=500x400)
+- Swim, 6 × 3 × 1,20 m : 4200.00 EUR TTC, 7 à 9 personnes, environ 19000 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo?taille=600x300)
+- Family Plus, 6 × 4 × 1,20 m : 4999.00 EUR TTC, 8 à 10 personnes, environ 25500 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo?taille=600x400)
+- Resort, 6 × 5 × 1,20 m : 5500.00 EUR TTC, 10 à 12 personnes, environ 31700 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo?taille=600x500)
 
 Livraison en France métropolitaine : 360.00 EUR par commande. Retrait gratuit au dépôt de Noisy-le-Grand (Île-de-France), sur rendez-vous.
 Offerts avec chaque piscine : pompe de gonflage électrique (valeur 150 EUR) et système de filtration à sable (valeur 290 EUR).

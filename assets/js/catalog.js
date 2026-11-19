@@ -71,7 +71,7 @@
       shortName: 'Ronde',
       sku: 'IPG-RONDE',
       finish: 'Emerald Grey',
-      page: '/piscine-ronde-ipoolgo.html',
+      page: '/piscine-ronde-ipoolgo',
       image: '/assets/images/piscine-ronde-ipoolgo-emerald-grey.jpg',
       defaultSize: '300x120',
       sizes: [
@@ -92,7 +92,7 @@
       shortName: 'Rectangulaire',
       sku: 'IPG-RECT',
       finish: 'Emerald Grey',
-      page: '/piscine-rectangulaire-ipoolgo.html',
+      page: '/piscine-rectangulaire-ipoolgo',
       image: '/assets/images/piscine-rectangulaire-ipoolgo-emerald-grey.jpg',
       defaultSize: '300x200',
       sizes: [

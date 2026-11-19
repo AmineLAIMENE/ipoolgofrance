@@ -170,6 +170,19 @@ function jsonLd(data) {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
 
+// Rétractation de 14 jours (CGV, article 8) : produit renvoyé par le client, à ses frais.
+const RETURN_POLICY = {
+  '@type': 'MerchantReturnPolicy',
+  '@id': `${SITE}/#retours`,
+  applicableCountry: 'FR',
+  returnPolicyCountry: 'FR',
+  returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+  merchantReturnDays: 14,
+  returnMethod: 'https://schema.org/ReturnByMail',
+  returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+  merchantReturnLink: `${SITE}/cgv#retractation`
+};
+
 // Une variante (Product + Offer) par taille, rattachée au ProductGroup de la fiche.
 function productVariants(modelId, image) {
   const model = catalog.getModel(modelId);
@@ -200,7 +213,8 @@ function productVariants(modelId, image) {
           transitTime: { '@type': 'QuantitativeValue', minValue: 5, maxValue: 10, unitCode: 'DAY' }
         }
       },
-      hasMerchantReturnPolicy: { '@id': `${SITE}/#retours` }
+      // Politique complète dans chaque offre : Google ne suit pas les @id d'un bloc JSON-LD à l'autre.
+      hasMerchantReturnPolicy: RETURN_POLICY
     }
   }));
 }
@@ -283,7 +297,8 @@ function renderFeed() {
       : '/assets/images/piscine-rectangulaire-ipoolgo-terrasse-1080.webp';
     model.sizes.forEach((size) => {
       const label = catalog.sizeLabel(size);
-      const title = `Piscine Gonflable Rigide iPoolGo ${model.shortName} ${label} - Pompe Offerte`;
+      // Pas de texte promotionnel dans le titre (refusé par Google) : les cadeaux vont dans product_highlight.
+      const title = `Piscine gonflable rigide iPoolGo ${model.shortName} ${label} en Drop-Stitch`;
       const description =
         `Piscine hors-sol gonflable rigide iPoolGo ${model.shortName} ${label} en Drop-Stitch, finition ${model.finish}, ` +
         `pour ${size.people} personnes. Pompe de gonflage électrique et système de filtration à sable offerts. ` +
@@ -295,6 +310,7 @@ function renderFeed() {
           `      <g:item_group_id>${model.sku}</g:item_group_id>`,
           `      <g:title>${esc(title)}</g:title>`,
           `      <g:description>${esc(description)}</g:description>`,
+          ...catalog.GIFTS.map((gift) => `      <g:product_highlight>Inclus sans supplément : ${esc(gift.name.toLowerCase())} (valeur ${gift.value} EUR)</g:product_highlight>`),
           `      <g:link>${esc(productUrl(model, size))}</g:link>`,
           `      <g:image_link>${SITE}${model.image}</g:image_link>`,
           `      <g:additional_image_link>${SITE}${extraImage}</g:additional_image_link>`,
