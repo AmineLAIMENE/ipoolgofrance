@@ -22,6 +22,7 @@ const PAGES = [
   'piscine-ronde-ipoolgo.html',
   'piscine-rectangulaire-ipoolgo.html',
   'comparatif-piscine-ipoolgo.html',
+  'qui-sommes-nous.html',
   'mentions-legales.html',
   'cgv.html',
   'commande.html',
@@ -119,7 +120,7 @@ const TEXT_FILE = /\.(html|css|js|json|xml|txt|toml|md|svg|example)$|^\.gitignor
 
 // ------------------------------------------------------------------ pages
 
-test('les 7 pages demandées existent, en français, avec leurs balises', () => {
+test('les pages demandées existent, en français, avec leurs balises', () => {
   PAGES.forEach((file) => {
     assert.ok(exists(file), `${file} manquant`);
     const source = html[file];
@@ -640,7 +641,7 @@ test('typographie : pas d\'espace insécable littérale dans le JavaScript, pas 
 
 // ------------------------------------------------------------------ serveur local
 
-test('serveur local : les 7 pages et leurs ressources répondent en 200', async () => {
+test('serveur local : les pages et leurs ressources répondent en 200', async () => {
   const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.xml': 'application/xml', '.txt': 'text/plain', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.ico': 'image/x-icon' };
   const server = http.createServer((request, response) => {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);

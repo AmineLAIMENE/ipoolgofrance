@@ -23,6 +23,7 @@ const PAGES = [
   'piscine-ronde-ipoolgo.html',
   'piscine-rectangulaire-ipoolgo.html',
   'comparatif-piscine-ipoolgo.html',
+  'qui-sommes-nous.html',
   'mentions-legales.html',
   'cgv.html',
   'commande.html',
