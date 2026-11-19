@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commandes | Administration iPoolGo France</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="/assets/css/style.css">
+<meta name="theme-color" content="#005f73">
+<script src="/assets/js/admin.js" defer></script>
+</head>
+<body class="admin">
+<header class="entete">
+  <div class="conteneur entete__barre">
+    <span class="marque">
+      <img src="/assets/images/logo-ipoolgo.webp" alt="iPoolGo" width="132" height="22">
+      <span>Administration</span>
+    </span>
+  </div>
+</header>
+<main id="contenu" class="conteneur admin__contenu">
+  <noscript><p class="message message--info">Cette page a besoin de JavaScript.</p></noscript>
+
+  <form class="admin__connexion" data-admin-connexion novalidate>
+    <h1>Connexion</h1>
+    <div class="champ">
+      <label for="admin-utilisateur">Identifiant</label>
+      <input id="admin-utilisateur" name="utilisateur" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+    </div>
+    <div class="champ">
+      <label for="admin-mot-de-passe">Mot de passe</label>
+      <input id="admin-mot-de-passe" name="motDePasse" type="password" autocomplete="current-password" required>
+    </div>
+    <p class="champ__erreur" data-admin-erreur-connexion role="alert" hidden></p>
+    <button class="bouton bouton--large" type="submit">Se connecter</button>
+  </form>
+
+  <section class="admin__commandes" data-admin-commandes aria-labelledby="titre-commandes" hidden>
+    <div class="admin__titre">
+      <h1 id="titre-commandes">Commandes</h1>
+      <div class="admin__actions">
+        <button type="button" class="bouton bouton--contour" data-admin-actualiser>Actualiser</button>
+        <button type="button" class="bouton bouton--contour" data-admin-deconnexion>Se déconnecter</button>
+      </div>
+    </div>
+    <p class="admin__resume" data-admin-resume aria-live="polite"></p>
+    <p class="champ__erreur" data-admin-erreur role="alert" hidden></p>
+    <div class="admin__tableau">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Date et heure</th>
+            <th scope="col">N° de commande</th>
+            <th scope="col">Client</th>
+            <th scope="col">Commande</th>
+            <th scope="col" class="admin__montant">Montant</th>
+            <th scope="col">Statut</th>
+          </tr>
+        </thead>
+        <tbody data-admin-lignes></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</body>
+</html>

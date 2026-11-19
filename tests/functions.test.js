@@ -11,6 +11,7 @@ const catalog = require('../assets/js/catalog.js');
 const createPayment = require('../netlify/functions/create-payment.js').handler;
 const checkPayment = require('../netlify/functions/check-payment.js').handler;
 const webhook = require('../netlify/functions/webhook.js').handler;
+const adminOrders = require('../netlify/functions/admin-orders.js').handler;
 
 const realFetch = global.fetch;
 const realConsole = { error: console.error, warn: console.warn };
@@ -713,3 +714,97 @@ test('fonctions : réponses JSON non mises en cache et sans détection de type',
 test('webhook : méthode GET refusée', async () => {
   assert.equal((await webhook({ httpMethod: 'GET', headers: {} })).statusCode, 405);
 });
+
+// ------------------------------------------------------------------ administration
+
+function adminLogin(user, password, headers) {
+  return post({ utilisateur: user, motDePasse: password }, headers);
+}
+
+function adminGet(token) {
+  return { httpMethod: 'GET', headers: token ? { authorization: `Bearer ${token}` } : {} };
+}
+
+async function adminToken() {
+  const response = await adminOrders(adminLogin('admin', 'mot-de-passe-solide'));
+  assert.equal(response.statusCode, 200);
+  return JSON.parse(response.body).jeton;
+}
+
+function withAdmin(run) {
+  return async () => {
+    process.env.ADMIN_USER = 'admin';
+    process.env.ADMIN_PASSWORD = 'mot-de-passe-solide';
+    try {
+      await run();
+    } finally {
+      delete process.env.ADMIN_USER;
+      delete process.env.ADMIN_PASSWORD;
+    }
+  };
+}
+
+test('admin : sans ADMIN_USER ni ADMIN_PASSWORD, tout est refusé', async () => {
+  const response = await adminOrders(adminLogin('admin', 'x'));
+  assert.equal(response.statusCode, 503);
+  assert.equal(JSON.parse(response.body).error, 'admin_non_configure');
+  assert.equal((await adminOrders(adminGet('1.x'))).statusCode, 503);
+});
+
+test('admin : mauvais identifiant ou mot de passe refusé, autre origine refusée', withAdmin(async () => {
+  assert.equal((await adminOrders(adminLogin('admin', 'mauvais'))).statusCode, 401);
+  assert.equal((await adminOrders(adminLogin('Admin', 'mot-de-passe-solide'))).statusCode, 401);
+  assert.equal((await adminOrders(adminLogin('admin', 'mot-de-passe-solide', { origin: 'https://exemple.com' }))).statusCode, 403);
+  assert.equal((await adminOrders(post('pas du json'))).statusCode, 400);
+  assert.equal(calls.length, 0, 'aucun appel à Stripe');
+}));
+
+test('admin : liste refusée sans jeton, avec un jeton forgé, expiré ou signé avec un ancien mot de passe', withAdmin(async () => {
+  const token = await adminToken();
+  const [expires] = token.split('.');
+  assert.equal((await adminOrders(adminGet(''))).statusCode, 401);
+  assert.equal((await adminOrders(adminGet(`${expires}.${'A'.repeat(43)}`))).statusCode, 401);
+  assert.equal((await adminOrders(adminGet(`${Number(expires) + 1000}.${token.split('.')[1]}`))).statusCode, 401, 'expiration modifiée');
+  assert.equal((await adminOrders(adminGet(`${Date.now() - 1000}.${token.split('.')[1]}`))).statusCode, 401, 'expiré');
+  process.env.ADMIN_PASSWORD = 'nouveau-mot-de-passe';
+  assert.equal((await adminOrders(adminGet(token))).statusCode, 401, 'mot de passe changé');
+  assert.equal(calls.length, 0, 'aucun appel à Stripe');
+}));
+
+test('admin : liste des commandes lue dans Stripe, autres sources écartées, statuts et client', withAdmin(async () => {
+  const token = await adminToken();
+  const other = paidSession({ id: 'cs_test_autre', metadata: { source: 'autre-site.fr', reference: 'X' } });
+  const refunded = paidSession({ id: 'cs_test_rembourse', created: 1795000000 }, {}, { amount_refunded: 100 });
+  const pending = paidSession({ id: 'cs_test_attente', created: 1795000100, payment_status: 'unpaid' });
+  mockFetch((call) => {
+    assert.ok(call.url.startsWith(`${STRIPE}/checkout/sessions?`));
+    const query = new URL(call.url).searchParams;
+    assert.equal(query.get('status'), 'complete');
+    assert.equal(query.get('expand[]'), 'data.payment_intent.latest_charge');
+    if (!query.get('starting_after')) return reply(200, { data: [paidSession({ created: 1795099235 }), other], has_more: true });
+    assert.equal(query.get('starting_after'), 'cs_test_autre');
+    return reply(200, { data: [refunded, pending], has_more: false });
+  });
+  const response = await adminOrders(adminGet(token));
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.headers['Cache-Control'], 'no-store');
+  const body = JSON.parse(response.body);
+  assert.equal(body.tronque, false);
+  assert.deepEqual(body.commandes.map((c) => c.statut), ['payee', 'remboursee', 'en_attente']);
+  const first = body.commandes[0];
+  assert.equal(first.reference, 'IPG-261119-ABCDE');
+  assert.equal(first.date, new Date(1795099235 * 1000).toISOString());
+  assert.equal(first.montant, catalog.formatAmount(TOTAL));
+  assert.deepEqual(first.client, {
+    prenom: 'Camille', nom: 'Martin', email: 'camille.martin@example.com', telephone: '0612345678',
+    adresse: '12 rue des Lilas', codePostal: '69003', ville: 'Lyon'
+  });
+}));
+
+test('admin : Stripe indisponible -> 502 sans détail', withAdmin(async () => {
+  const token = await adminToken();
+  mockFetch(() => reply(500, { error: { message: 'boom' } }));
+  const response = await adminOrders(adminGet(token));
+  assert.equal(response.statusCode, 502);
+  assert.ok(!response.body.includes('boom'));
+}));

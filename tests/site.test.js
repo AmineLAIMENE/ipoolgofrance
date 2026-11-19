@@ -674,3 +674,14 @@ test('serveur local : les 7 pages et leurs ressources répondent en 200', async 
     await new Promise((resolve) => server.close(resolve));
   }
 });
+
+test('administration : page noindex, hors sitemap, sans analytics ni script en ligne, en-têtes Netlify', () => {
+  const source = read('admin.html');
+  assert.match(source, /<meta name="robots" content="noindex, nofollow">/);
+  assert.ok(!/app\.js|googletagmanager|gtag/.test(source), 'pas de Google Analytics ni de bandeau cookies');
+  assert.ok(!/<script\b(?![^>]*\ssrc="\/assets\/js\/admin\.js")[^>]*>/.test(source), 'seul admin.js est chargé');
+  assert.ok(!/<style\b|\sstyle="|\son[a-z]+="/.test(source), 'compatible CSP');
+  assert.ok(!read('sitemap.xml').includes('admin'), 'absente du sitemap');
+  const toml = read('netlify.toml');
+  assert.match(toml, /for = "\/admin\*"\n  \[headers\.values\]\n    X-Robots-Tag = "noindex, nofollow"\n    Cache-Control = "no-store"/);
+});

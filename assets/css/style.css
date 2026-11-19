@@ -2517,3 +2517,164 @@ strong {
     display: none !important;
   }
 }
+
+/* ------------------------------------------------------------ administration */
+
+.admin__contenu {
+  padding-block: clamp(2rem, 5vw, 3.5rem) 4rem;
+}
+
+.admin__titre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin__connexion {
+  display: grid;
+  gap: 1rem;
+  max-width: 24rem;
+  margin: 0 auto;
+}
+
+.admin__resume {
+  margin: 0.4rem 0 1.25rem;
+  color: var(--encre-douce);
+}
+
+.admin__tableau {
+  overflow-x: auto;
+  background: var(--blanc);
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon-moyen);
+}
+
+.admin__tableau table {
+  width: 100%;
+  min-width: 56rem;
+  border-collapse: collapse;
+  font-size: 0.925rem;
+}
+
+.admin__tableau th,
+.admin__tableau td {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--trait);
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin__tableau th {
+  background: var(--eau);
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.admin__tableau td > * {
+  display: block;
+  width: fit-content;
+}
+
+.admin__tableau tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin__tableau td:first-child,
+.admin__reference {
+  white-space: nowrap;
+}
+
+.admin__reference {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-weight: 600;
+}
+
+.admin__tableau .admin__montant {
+  text-align: right;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.admin__tableau td.admin__montant > * {
+  margin-left: auto;
+}
+
+.admin__statut {
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.admin__statut--payee {
+  color: #1d6b3a;
+}
+
+.admin__statut--en_attente {
+  color: var(--ambre);
+}
+
+.admin__statut--remboursee {
+  color: var(--encre-douce);
+}
+
+/* Petit écran : une carte par commande, l'intitulé de colonne devant chaque valeur. */
+@media (max-width: 47.99rem) {
+  .admin__tableau {
+    background: none;
+    border: 0;
+  }
+
+  .admin__tableau table {
+    min-width: 0;
+  }
+
+  .admin__tableau thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .admin__tableau tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    padding: 0.4rem 0;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: var(--rayon-moyen);
+  }
+
+  .admin__tableau td {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    gap: 0 0.75rem;
+    padding: 0.4rem 0.9rem;
+    border: 0;
+  }
+
+  .admin__tableau td::before {
+    content: attr(data-label);
+    grid-row: 1 / span 9;
+    color: var(--encre-douce);
+    font-family: var(--texte);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+
+  .admin__tableau .admin__montant {
+    text-align: left;
+  }
+
+  .admin__tableau td.admin__montant > * {
+    margin-left: 0;
+  }
+}
