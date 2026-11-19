@@ -6,9 +6,9 @@
 (function () {
   'use strict';
 
-  // Identifiant de mesure Google Analytics 4. Remplacez G-XXXXXXXXXX par le vôtre (ex. G-AB12CD34EF).
-  // Tant que cette valeur reste telle quelle, aucun script Google n'est chargé.
-  var GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
+  // Identifiant de mesure Google Analytics 4 (flux Web ipoolgofrance.fr).
+  // Le script Google n'est chargé qu'après un clic sur « Accepter » dans le bandeau cookies.
+  var GA_MEASUREMENT_ID = 'G-N6JFV15RL5';
 
   var catalog = window.IPOOLGO;
   var KEYS = {

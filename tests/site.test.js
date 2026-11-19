@@ -500,7 +500,7 @@ test('Google Analytics : rien dans le HTML, chargement conditionné au consentem
   assert.equal(buttons[0], buttons[1], 'boutons Accepter et Refuser de même poids visuel');
 
   const app = read('assets/js/app.js');
-  assert.match(app, /var GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';/);
+  assert.match(app, /var GA_MEASUREMENT_ID = 'G-[A-Z0-9]{6,}';/);
   assert.equal(all(app, /googletagmanager\.com/).length, 1, 'un seul point de chargement de gtag.js');
   assert.match(app, /begin_checkout/);
   assert.match(app, /localStorage/);

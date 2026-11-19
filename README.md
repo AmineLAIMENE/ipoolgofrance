@@ -23,13 +23,14 @@ Les clés ne figurent jamais dans le dépôt ni dans le code envoyé au navigate
 
 ## Google Analytics 4
 
-Dans `assets/js/app.js`, remplacez `G-XXXXXXXXXX` par votre identifiant de mesure :
+L'identifiant de mesure est dans `assets/js/app.js` :
 
 ```js
-var GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
+var GA_MEASUREMENT_ID = 'G-N6JFV15RL5';
 ```
 
-Le script de Google n'est chargé qu'après un clic sur « Accepter » dans le bandeau cookies. Tant que l'identifiant reste `G-XXXXXXXXXX`, rien n'est chargé.
+Le script de Google n'est chargé qu'après un clic sur « Accepter » dans le bandeau cookies.
+S'il est remis à `G-XXXXXXXXXX`, rien n'est chargé.
 
 ## Changer un prix, une taille ou les frais de livraison
 
