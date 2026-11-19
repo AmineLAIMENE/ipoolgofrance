@@ -780,7 +780,9 @@ strong {
 .modele__image img {
   width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: contain;
+  object-fit: cover;
+  /* Photos en situation : la piscine occupe le bas de l'image. */
+  object-position: 50% 70%;
 }
 
 .modele__corps {
@@ -1372,6 +1374,7 @@ strong {
   width: 100%;
   aspect-ratio: 16 / 10;
   object-fit: cover;
+  object-position: 50% 70%;
   margin-bottom: 0.5rem;
   border-radius: var(--rayon-petit);
   background: #f1f1ef;
