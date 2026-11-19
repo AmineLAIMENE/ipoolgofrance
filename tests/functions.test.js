@@ -593,15 +593,16 @@ test('webhook : clé Brevo absente, 500 sans envoi', async () => {
   assert.equal(brevoCalls().length, 0);
 });
 
-test('webhook : sans SELLER_EMAIL ni SENDER_EMAIL, adresse du vendeur par défaut', async () => {
+test('webhook : sans SELLER_EMAIL ni SENDER_EMAIL, envoi depuis noreply@ipoolgofrance.fr, réponses vers le vendeur', async () => {
   delete process.env.SELLER_EMAIL;
   delete process.env.SENDER_EMAIL;
   stripeAndBrevo(paidSession());
   assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 200);
   const [seller, customer] = brevoCalls();
   assert.deepEqual(seller.body.to, [{ email: 'contact@gigifrance.fr' }]);
-  assert.equal(seller.body.sender.email, 'contact@gigifrance.fr');
-  assert.equal(customer.body.sender.email, 'contact@gigifrance.fr');
+  assert.equal(seller.body.sender.email, 'noreply@ipoolgofrance.fr');
+  assert.equal(customer.body.sender.email, 'noreply@ipoolgofrance.fr');
+  assert.equal(seller.body.replyTo.email, 'camille.martin@example.com');
   assert.equal(customer.body.replyTo.email, 'contact@gigifrance.fr');
 });
 

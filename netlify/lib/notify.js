@@ -15,14 +15,17 @@ const { sellerEmail, customerEmail } = require('./emails.js');
 
 const FLAGS = { seller: 'mail_vendeur', customer: 'mail_client' };
 
-// Adresse du vendeur, qui reçoit les commandes et sert d'expéditeur (validée dans Brevo).
-// Les variables d'environnement SELLER_EMAIL et SENDER_EMAIL la remplacent si besoin.
+// Adresse du vendeur : elle reçoit les commandes et les réponses des clients (replyTo).
 const DEFAULT_EMAIL = 'contact@gigifrance.fr';
+// Expéditeur sur le domaine du site, authentifié dans Brevo : le domaine gigifrance.fr en
+// expéditeur est refusé par IONOS (liste Spamhaus). Personne ne lit cette boîte.
+const DEFAULT_SENDER = 'noreply@ipoolgofrance.fr';
+// Les variables d'environnement SELLER_EMAIL et SENDER_EMAIL les remplacent si besoin.
 
 function emailEnv() {
   return {
     SELLER_EMAIL: (process.env.SELLER_EMAIL || '').trim() || DEFAULT_EMAIL,
-    SENDER_EMAIL: (process.env.SENDER_EMAIL || '').trim() || DEFAULT_EMAIL
+    SENDER_EMAIL: (process.env.SENDER_EMAIL || '').trim() || DEFAULT_SENDER
   };
 }
 
@@ -75,4 +78,4 @@ async function notifyOrder(payment, caller) {
   return failed ? 'failed' : 'sent';
 }
 
-module.exports = { FLAGS, DEFAULT_EMAIL, emailEnv, notifyOrder };
+module.exports = { FLAGS, DEFAULT_EMAIL, DEFAULT_SENDER, emailEnv, notifyOrder };
