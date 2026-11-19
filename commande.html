@@ -70,7 +70,7 @@
     <nav class="fil" aria-label="Fil d’Ariane"><ol><li><a href="/">Accueil</a></li><li aria-current="page">Commande</li></ol></nav>
     <div class="section__tete">
       <h1>Votre commande</h1>
-      <p>Choisissez la forme et la taille. Le plan à l’échelle et le total se mettent à jour à chaque changement. Vous payez ensuite sur la page sécurisée de Stripe.</p>
+      <p>Choisissez la forme, la taille, puis la livraison ou le retrait dans le récapitulatif. Le plan à l’échelle et le total se mettent à jour à chaque changement. Vous payez ensuite sur la page sécurisée de Stripe.</p>
     </div>
     <noscript><p class="message message--info">La commande en ligne a besoin de JavaScript. Vous pouvez aussi commander <a href="mailto:contact@gigifrance.fr">par e-mail</a> ou par téléphone au 07 80 80 67 64.</p></noscript>
     <form class="commande" data-config data-commande method="post" novalidate>
@@ -123,14 +123,6 @@
 <!-- /catalog:tailles-rectangulaire -->
           </div>
         </fieldset>
-        <fieldset class="bloc">
-          <legend>3. Livraison ou retrait <span class="legende__requis">(obligatoire)</span></legend>
-          <div class="remises">
-            <label class="taille remise"><input type="radio" name="remise" value="livraison" required><span class="taille__nom">Livraison France métropolitaine</span><span class="taille__info">À domicile, sous 5 à 10 jours ouvrés</span><span class="taille__prix" data-catalog="livraison">360&nbsp;€</span></label>
-            <label class="taille remise"><input type="radio" name="remise" value="retrait" required><span class="taille__nom">Retrait au dépôt</span><span class="taille__info">Noisy-le-Grand (Île-de-France), sur rendez-vous</span><span class="taille__prix">Gratuit</span></label>
-          </div>
-          <p class="remise__note" data-remise="retrait" hidden>Après la commande, nous vous appelons sous 2 jours ouvrés pour fixer le jour du retrait et vous donner l’adresse exacte. Prévoyez un véhicule assez grand pour les cartons.</p>
-        </fieldset>
       </div>
 
       <aside class="commande__recap recap" aria-label="Récapitulatif de votre commande">
@@ -144,7 +136,16 @@
           <div><dt>Piscine</dt><dd data-out="prix" data-catalog="ronde.300x120.prix">1&#8239;399&nbsp;€</dd></div>
           <div class="recap__offert"><dt>Pompe de gonflage électrique</dt><dd><s><span data-catalog="pompe">150&nbsp;€</span></s> Offerte</dd></div>
           <div class="recap__offert"><dt>Filtration à sable</dt><dd><s><span data-catalog="filtration">290&nbsp;€</span></s> Offerte</dd></div>
-          <div><dt data-out="remise-libelle">Livraison ou retrait</dt><dd data-out="livraison">À choisir</dd></div>
+        </dl>
+        <fieldset class="recap__remise">
+          <legend>Livraison ou retrait <span class="legende__requis">(obligatoire)</span></legend>
+          <div class="remises">
+            <label class="remise"><input type="radio" name="remise" value="livraison" required><span class="remise__nom">Livraison France métropolitaine</span><span class="remise__info">À domicile, sous 5 à 10 jours ouvrés</span><span class="remise__prix" data-catalog="livraison">360&nbsp;€</span></label>
+            <label class="remise"><input type="radio" name="remise" value="retrait" required><span class="remise__nom">Retrait au dépôt</span><span class="remise__info">Noisy-le-Grand (Île-de-France), sur rendez-vous</span><span class="remise__prix">Gratuit</span></label>
+          </div>
+          <p class="remise__note" data-remise="retrait" hidden>Après la commande, nous vous appelons sous 2 jours ouvrés pour fixer le jour du retrait et vous donner l’adresse exacte. Prévoyez un véhicule assez grand pour les cartons.</p>
+        </fieldset>
+        <dl class="recap__lignes">
           <div class="recap__total" aria-live="polite" aria-atomic="true"><dt data-out="total-libelle">Total hors livraison</dt><dd data-out="total" data-catalog="ronde.300x120.prix">1&#8239;399&nbsp;€</dd></div>
         </dl>
         <p class="recap__note" data-out="urbanisme"></p>
@@ -152,7 +153,7 @@
 
       <div class="commande__client">
         <fieldset class="bloc">
-          <legend>4. Vos coordonnées<span data-remise="livraison"> de livraison</span></legend>
+          <legend>3. Vos coordonnées<span data-remise="livraison"> de livraison</span></legend>
           <div class="champs">
           <div class="champ champ--moitie">
             <label for="champ-prenom">Prénom</label>
