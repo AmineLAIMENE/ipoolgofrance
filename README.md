@@ -12,13 +12,13 @@ Le site est statique (HTML, CSS, JavaScript, sans framework ni dépendance npm).
    | Variable | Contenu |
    |---|---|
    | `STRIPE_SECRET_KEY` | Clé restreinte Stripe `rk_...` (`rk_test_` pour essayer, `rk_live_` en production). Droits : Checkout Sessions et PaymentIntents en écriture, Charges en lecture |
-   | `STRIPE_WEBHOOK_SECRET` | Secret de signature du webhook (`whsec_...`), conseillé |
+   | `STRIPE_WEBHOOK_SECRET` | Secret de signature du webhook (`whsec_...`), si le webhook est créé |
    | `BREVO_API_KEY` | Clé API Brevo (e-mails transactionnels) |
-   | `SELLER_EMAIL` | Adresse qui reçoit l'alerte « Nouvelle commande payée » |
-   | `SENDER_EMAIL` | Adresse d'expédition, validée dans Brevo |
+   | `SELLER_EMAIL` | Facultatif : adresse qui reçoit l'alerte « [iPoolGoFrance.fr] Nouvelle commande payée » (par défaut `contact@gigifrance.fr`) |
+   | `SENDER_EMAIL` | Facultatif : adresse d'expédition, validée dans Brevo (par défaut `contact@gigifrance.fr`) |
 
 3. Dans « Domain management », ajoutez `ipoolgofrance.fr` (domaine principal) et `ipoolgofrance.com`. Les redirections 301 vers `https://ipoolgofrance.fr` sont dans `netlify.toml`.
-4. Dans Stripe, « Développeurs > Webhooks », ajoutez l'adresse `https://ipoolgofrance.fr/.netlify/functions/webhook` avec les événements `checkout.session.completed` et `checkout.session.async_payment_succeeded`, puis copiez son secret dans `STRIPE_WEBHOOK_SECRET`.
+4. Facultatif : dans Stripe, « Développeurs > Webhooks », ajoutez l'adresse `https://ipoolgofrance.fr/.netlify/functions/webhook` avec les événements `checkout.session.completed` et `checkout.session.async_payment_succeeded`, puis copiez son secret dans `STRIPE_WEBHOOK_SECRET`. Sans webhook, les e-mails de commande partent quand le client revient sur `merci.html` (fonction `check-payment`) ; le webhook couvre en plus le client qui ferme la page de paiement sans revenir.
 5. Relancez un déploiement après avoir créé les variables.
 
 Les moyens de paiement proposés (carte, Apple Pay, Klarna...) se règlent dans le tableau de bord Stripe, pas dans le code. La clé publiable `pk_...` n'est pas utilisée : la page de paiement est hébergée par Stripe.
@@ -47,18 +47,23 @@ npm test       # vérifie le site et les fonctions
 
 `SHIPPING_EUR` fixe les frais de livraison (0 pour une livraison offerte).
 
+`testSizes` (modèle `ronde`) contient la « Piscine test ronde » à 1 €, port offert, pour une commande réelle
+d'essai : `https://ipoolgofrance.fr/commande.html?modele=ronde&taille=test-1m`. Elle n'apparaît dans aucune page,
+donnée structurée ni flux. À supprimer avant l'ouverture, et le paiement d'essai est à rembourser dans Stripe.
+
 ## Paiement
 
 ```
 Formulaire  ->  create-payment  ->  page Stripe Checkout    ->  merci.html  ->  check-payment
-                                              |
-                                              v
-                                    webhook  ->  e-mails Brevo (vendeur + client)
+                                              |                                      |
+                                              v                                      v
+                                    webhook (facultatif)  ->  e-mails Brevo (vendeur + client), une seule fois
 ```
 
 - `netlify/functions/create-payment.js` valide le modèle, la taille et les coordonnées, recalcule le prix à partir du catalogue et refuse tout montant qui ne correspond pas, puis crée la session Stripe Checkout avec une référence de commande courte (`IPG-AAMMJJ-XXXXX`).
-- `netlify/functions/check-payment.js` renvoie l'état de la session et un récapitulatif sans donnée personnelle pour `merci.html`.
-- `netlify/functions/webhook.js` reçoit l'événement de Stripe, vérifie sa signature si `STRIPE_WEBHOOK_SECRET` est définie, relit la session chez Stripe avec la clé secrète et n'envoie les deux e-mails que si elle est payée (ni remboursée ni contestée). Chaque envoi est noté dans les métadonnées du paiement Stripe : si un e-mail échoue, la fonction répond 500, Stripe rappelle le webhook et seul l'e-mail manquant repart.
+- `netlify/functions/check-payment.js` renvoie l'état de la session et un récapitulatif sans donnée personnelle pour `merci.html`. Si le paiement est confirmé, il envoie aussi les e-mails qui ne sont pas encore partis (`netlify/lib/notify.js`).
+- `netlify/functions/webhook.js` (facultatif) reçoit l'événement de Stripe, vérifie sa signature si `STRIPE_WEBHOOK_SECRET` est définie, relit la session chez Stripe avec la clé secrète et n'envoie les deux e-mails que si elle est payée (ni remboursée ni contestée). Chaque envoi est noté dans les métadonnées du paiement Stripe : si un e-mail échoue, la fonction répond 500, Stripe rappelle le webhook et seul l'e-mail manquant repart.
+- L'e-mail au vendeur a pour objet `[iPoolGoFrance.fr] Nouvelle commande iPoolGo France payée : ...`.
 
 `create-payment` n'accepte que les requêtes venant du site (en-tête `Origin`). Les fonctions n'ont pas de limite de débit propre : si votre offre Netlify le permet, ajoutez une règle de « rate limiting » sur `/.netlify/functions/*`.
 

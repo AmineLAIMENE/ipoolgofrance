@@ -3,8 +3,11 @@
 // GET /.netlify/functions/check-payment?id=cs_xxx
 // Renvoie le statut de la session Stripe et un récapitulatif sans donnée personnelle
 // (ni nom, ni e-mail, ni adresse) pour la page merci.html.
+// Si le paiement est confirmé, envoie aussi les e-mails de commande qui ne sont
+// pas encore partis : la commande est notifiée même sans webhook Stripe.
 
-const { ORDER_SOURCE, ApiError, json, isPaymentId, stripe, toPayment } = require('../lib/shared.js');
+const { ORDER_SOURCE, ApiError, json, isPaymentId, readSession, toPayment } = require('../lib/shared.js');
+const { notifyOrder } = require('../lib/notify.js');
 
 exports.handler = async function handler(event) {
   if (event.httpMethod !== 'GET') {
@@ -18,7 +21,7 @@ exports.handler = async function handler(event) {
 
   let payment;
   try {
-    payment = toPayment(await stripe('GET', `/checkout/sessions/${id}`));
+    payment = toPayment(await readSession(id));
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
       return json(404, { error: 'paiement_introuvable' });
@@ -31,6 +34,9 @@ exports.handler = async function handler(event) {
   if (metadata.source !== ORDER_SOURCE) {
     return json(404, { error: 'paiement_introuvable' });
   }
+
+  // Un échec d'envoi ne bloque pas la page : le prochain appel (ou le webhook) réessaie.
+  await notifyOrder(payment, 'check-payment');
 
   return json(200, {
     status: payment.status,

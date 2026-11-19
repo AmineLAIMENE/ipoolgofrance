@@ -277,12 +277,14 @@
       $all('[data-tailles]', root).forEach(function (group) {
         group.hidden = group.getAttribute('data-tailles') !== state.model;
       });
-      var radio = $('input[name="taille-' + state.model + '"][value="' + state.size + '"]', root);
-      if (radio) radio.checked = true;
+      // Une taille sans case (taille de test) ne laisse aucune autre case cochée.
+      $all('input[name="taille-' + state.model + '"]', root).forEach(function (input) {
+        input.checked = input.value === state.size;
+      });
 
       var values = {
         produit: nb(quote.label),
-        modele: quote.model.name,
+        modele: size.label || quote.model.name,
         taille: nb(catalog.sizeLabel(size)),
         personnes: size.people + ' personnes',
         volume: 'environ ' + litres(size.volume),

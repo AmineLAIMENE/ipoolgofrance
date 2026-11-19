@@ -134,7 +134,7 @@ function sellerEmail(payment, env) {
     sender: { name: 'Boutique iPoolGo France', email: env.SENDER_EMAIL },
     to: [{ email: env.SELLER_EMAIL }],
     replyTo: { email: metadata.email, name: address[0] },
-    subject: `Nouvelle commande iPoolGo France payée : ${metadata.produit} (${total})`,
+    subject: `[iPoolGoFrance.fr] Nouvelle commande iPoolGo France payée : ${metadata.produit} (${total})`,
     htmlContent: html,
     textContent: text,
     tags: ['commande-vendeur']

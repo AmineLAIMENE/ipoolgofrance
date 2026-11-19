@@ -320,6 +320,18 @@ test('les pages, llms.txt et le flux sont synchronisés avec le catalogue', () =
   assert.equal(sync.renderFeed(), read('google-shopping.xml'), 'google-shopping.xml désynchronisé');
 });
 
+test('piscine test ronde : 1 € port compris, commandable par lien, invisible partout ailleurs', () => {
+  const quote = catalog.quote('ronde', 'test-1m');
+  assert.equal(quote.label, 'Piscine test ronde');
+  assert.equal(quote.total, 1);
+  catalog.MODEL_IDS.forEach((id) => {
+    assert.ok(!catalog.MODELS[id].sizes.some((size) => size.id.startsWith('test')), `${id} : taille test dans les tailles publiques`);
+  });
+  PAGES.concat(['llms.txt', 'google-shopping.xml', 'sitemap.xml']).forEach((file) => {
+    assert.ok(!/test-1m|Piscine test/i.test(read(file)), `${file} : la piscine test ne doit pas apparaître`);
+  });
+});
+
 test('les prix « dès … € » des balises meta correspondent au catalogue', () => {
   const minimum = Math.min(...catalog.MODEL_IDS.flatMap((id) => catalog.MODELS[id].sizes.map((size) => size.price)));
   catalog.MODEL_IDS.forEach((id) => {
@@ -548,8 +560,11 @@ test('aucun secret dans le dépôt, aucune clé ni API de paiement côté naviga
   });
 
   const env = read('.env.example');
-  ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'BREVO_API_KEY', 'SELLER_EMAIL', 'SENDER_EMAIL'].forEach((name) => {
+  ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'BREVO_API_KEY'].forEach((name) => {
     assert.match(env, new RegExp(`^${name}=$`, 'm'), `.env.example : ${name} doit être listée sans valeur`);
+  });
+  ['SELLER_EMAIL', 'SENDER_EMAIL'].forEach((name) => {
+    assert.match(env, new RegExp(`^# ${name}=`, 'm'), `.env.example : ${name} doit être listée en option`);
   });
 
   const front = ALL_HTML.concat(['assets/js/app.js', 'assets/js/catalog.js', 'assets/css/style.css']);

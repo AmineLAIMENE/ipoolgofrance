@@ -336,10 +336,10 @@ test('check-payment : statut et récapitulatif sans donnée personnelle', async 
     [{ status: 'expired', payment_status: 'unpaid' }, 'expired']
   ];
   for (const [state, expected] of cases) {
-    mockFetch(() => reply(200, paidSession(Object.assign({ payment_intent: 'pi_3QabcDEF' }, state))));
+    stripeAndBrevo(paidSession(state));
     const response = await checkPayment(get(SESSION_ID));
     assert.equal(response.statusCode, 200);
-    assert.equal(calls[0].url, `${STRIPE}/checkout/sessions/${SESSION_ID}`);
+    assert.equal(calls[0].url, `${STRIPE}/checkout/sessions/${SESSION_ID}?expand[]=payment_intent.latest_charge`);
     assert.equal(calls[0].headers.Authorization, 'Bearer rk_test_cle_stripe_factice');
     const body = JSON.parse(response.body);
     assert.equal(body.status, expected, JSON.stringify(state));
@@ -404,7 +404,7 @@ test('webhook : paiement payé, vérifié chez Stripe puis deux e-mails Brevo', 
   }
 
   assert.deepEqual(seller.body.to, [{ email: 'vendeur@example.com' }]);
-  assert.match(seller.body.subject, /^Nouvelle commande iPoolGo France payée/);
+  assert.match(seller.body.subject, /^\[iPoolGoFrance\.fr\] Nouvelle commande iPoolGo France payée/);
   assert.equal(seller.body.replyTo.email, 'camille.martin@example.com');
   for (const expected of ['IPG-261119-ABCDE', SESSION_ID, 'Piscine iPoolGo Ronde', 'Ø 3 m × 1,20 m', '12 rue des Lilas', '69003 Lyon', '0612345678']) {
     assert.ok(seller.body.htmlContent.includes(expected), `e-mail vendeur sans ${expected}`);
@@ -546,10 +546,51 @@ test('webhook : un e-mail en échec, 500 et seul l’envoi réussi est marqué',
   assert.equal(brevoCalls()[0].body.to[0].email, 'camille.martin@example.com');
 });
 
-test('webhook : configuration Brevo incomplète, 500 sans envoi', async () => {
-  delete process.env.SELLER_EMAIL;
+test('webhook : clé Brevo absente, 500 sans envoi', async () => {
+  delete process.env.BREVO_API_KEY;
   stripeAndBrevo(paidSession());
   assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 500);
+  assert.equal(brevoCalls().length, 0);
+});
+
+test('webhook : sans SELLER_EMAIL ni SENDER_EMAIL, adresse du vendeur par défaut', async () => {
+  delete process.env.SELLER_EMAIL;
+  delete process.env.SENDER_EMAIL;
+  stripeAndBrevo(paidSession());
+  assert.equal((await webhook(hook(stripeEvent(SESSION_ID)))).statusCode, 200);
+  const [seller, customer] = brevoCalls();
+  assert.deepEqual(seller.body.to, [{ email: 'contact@gigifrance.fr' }]);
+  assert.equal(seller.body.sender.email, 'contact@gigifrance.fr');
+  assert.equal(customer.body.sender.email, 'contact@gigifrance.fr');
+  assert.equal(customer.body.replyTo.email, 'contact@gigifrance.fr');
+});
+
+test('check-payment : paiement confirmé, les e-mails partent une seule fois sans webhook', async () => {
+  stripeAndBrevo(paidSession());
+  assert.equal((await checkPayment(get(SESSION_ID))).statusCode, 200);
+  assert.equal(brevoCalls().length, 2);
+  const mark = calls.find((call) => call.method === 'POST' && call.url.startsWith(STRIPE));
+  assert.equal(mark.url, `${STRIPE}/payment_intents/pi_3QabcDEF`);
+  assert.ok(mark.body['metadata[mail_vendeur]']);
+  assert.ok(mark.body['metadata[mail_client]']);
+
+  // Nouvel affichage de merci.html : déjà noté, rien ne repart.
+  stripeAndBrevo(paidSession({}, { mail_vendeur: '2026-11-19T10:00:00Z', mail_client: '2026-11-19T10:00:00Z' }));
+  assert.equal((await checkPayment(get(SESSION_ID))).statusCode, 200);
+  assert.equal(brevoCalls().length, 0);
+});
+
+test('check-payment : envoi Brevo en échec, la page reçoit quand même le statut', async () => {
+  stripeAndBrevo(paidSession(), 500);
+  const response = await checkPayment(get(SESSION_ID));
+  assert.equal(response.statusCode, 200);
+  assert.equal(JSON.parse(response.body).status, 'paid');
+  assert.equal(calls.filter((call) => call.method === 'POST' && call.url.startsWith(STRIPE)).length, 0);
+});
+
+test('check-payment : paiement non confirmé, aucun e-mail', async () => {
+  stripeAndBrevo(paidSession({ status: 'open', payment_status: 'unpaid' }));
+  assert.equal((await checkPayment(get(SESSION_ID))).statusCode, 200);
   assert.equal(brevoCalls().length, 0);
 });
 
