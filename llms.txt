@@ -2,12 +2,12 @@
 
 > iPoolGo est une marque de piscines hors-sol gonflables rigides. iPoolGo France (https://ipoolgofrance.fr) est la boutique en ligne de SAS Virage, revendeur officiel des piscines iPoolGo en France. Les piscines sont vendues, expédiées et suivies depuis la France par SAS Virage (Paris). Une piscine iPoolGo est une piscine hors-sol gonflable rigide : ses parois en Drop-Stitch se gonflent à haute pression en 20 à 30 minutes et tiennent debout sans armature métallique. Chaque piscine est livrée avec une pompe de gonflage électrique et une filtration à sable offertes.
 
-Site en français. Prix TTC en euros. Livraison en France métropolitaine uniquement, ou retrait gratuit à Noisy-le-Grand (Île-de-France). Mise à jour : 19 novembre 2026.
+Site en français. Prix TTC en euros. Livraison en France métropolitaine uniquement, ou retrait gratuit au dépôt de Noisy-le-Grand (Île-de-France). Mise à jour : 19 novembre 2026.
 
 ## Pages
 
 - [Accueil](https://ipoolgofrance.fr/): les deux modèles, leurs prix et les avis d'acheteurs.
-- [Commande](https://ipoolgofrance.fr/commande.html): choix de la forme et de la taille, total, livraison ou retrait gratuit, coordonnées et paiement en ligne (Stripe).
+- [Commande](https://ipoolgofrance.fr/commande.html): choix de la forme et de la taille, total, choix obligatoire entre livraison et retrait gratuit au dépôt, coordonnées et paiement en ligne (Stripe).
 - [Piscine iPoolGo Ronde](https://ipoolgofrance.fr/piscine-ronde-ipoolgo.html): 9 tailles de Ø 2 m à Ø 6 m, fiche technique, installation, entretien, questions fréquentes.
 - [Piscine iPoolGo Rectangulaire](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html): 8 formats de 2 × 2 m à 6 × 5 m, fiche technique, installation sur terrasse, questions fréquentes.
 - [Comparatif des piscines hors-sol](https://ipoolgofrance.fr/comparatif-piscine-ipoolgo.html): Drop-Stitch, autoportante à boudin et tubulaire comparées (montage, parois, prix, rangement, réglementation), avec les sources.
@@ -40,7 +40,7 @@ Site en français. Prix TTC en euros. Livraison en France métropolitaine unique
 - Family Plus, 6 × 4 × 1,20 m : 4999.00 EUR TTC, 8 à 10 personnes, environ 25500 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=600x400)
 - Resort, 6 × 5 × 1,20 m : 5500.00 EUR TTC, 10 à 12 personnes, environ 31700 litres. [Commander](https://ipoolgofrance.fr/piscine-rectangulaire-ipoolgo.html?taille=600x500)
 
-Livraison en France métropolitaine : 360.00 EUR par commande. Retrait gratuit à Noisy-le-Grand (Île-de-France), sur rendez-vous.
+Livraison en France métropolitaine : 360.00 EUR par commande. Retrait gratuit au dépôt de Noisy-le-Grand (Île-de-France), sur rendez-vous.
 Offerts avec chaque piscine : pompe de gonflage électrique (valeur 150 EUR) et système de filtration à sable (valeur 290 EUR).
 <!-- /catalog:prix-llms -->
 

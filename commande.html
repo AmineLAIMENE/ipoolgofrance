@@ -124,10 +124,10 @@
           </div>
         </fieldset>
         <fieldset class="bloc">
-          <legend>3. Livraison ou retrait</legend>
+          <legend>3. Livraison ou retrait <span class="legende__requis">(obligatoire)</span></legend>
           <div class="remises">
-            <label class="taille remise"><input type="radio" name="remise" value="livraison" checked><span class="taille__nom">Livraison à domicile</span><span class="taille__info">France métropolitaine, 5 à 10 jours ouvrés</span><span class="taille__prix" data-catalog="livraison">360&nbsp;€</span></label>
-            <label class="taille remise"><input type="radio" name="remise" value="retrait"><span class="taille__nom">Retrait sur place</span><span class="taille__info">Noisy-le-Grand (Île-de-France), sur rendez-vous</span><span class="taille__prix">Gratuit</span></label>
+            <label class="taille remise"><input type="radio" name="remise" value="livraison" required><span class="taille__nom">Livraison France métropolitaine</span><span class="taille__info">À domicile, sous 5 à 10 jours ouvrés</span><span class="taille__prix" data-catalog="livraison">360&nbsp;€</span></label>
+            <label class="taille remise"><input type="radio" name="remise" value="retrait" required><span class="taille__nom">Retrait au dépôt</span><span class="taille__info">Noisy-le-Grand (Île-de-France), sur rendez-vous</span><span class="taille__prix">Gratuit</span></label>
           </div>
           <p class="remise__note" data-remise="retrait" hidden>Après la commande, nous vous appelons sous 2 jours ouvrés pour fixer le jour du retrait et vous donner l’adresse exacte. Prévoyez un véhicule assez grand pour les cartons.</p>
         </fieldset>
@@ -144,8 +144,8 @@
           <div><dt>Piscine</dt><dd data-out="prix" data-catalog="ronde.300x120.prix">1&#8239;399&nbsp;€</dd></div>
           <div class="recap__offert"><dt>Pompe de gonflage électrique</dt><dd><s><span data-catalog="pompe">150&nbsp;€</span></s> Offerte</dd></div>
           <div class="recap__offert"><dt>Filtration à sable</dt><dd><s><span data-catalog="filtration">290&nbsp;€</span></s> Offerte</dd></div>
-          <div><dt data-out="remise-libelle">Livraison en France métropolitaine</dt><dd data-out="livraison" data-catalog="livraison">360&nbsp;€</dd></div>
-          <div class="recap__total" aria-live="polite" aria-atomic="true"><dt>Total TTC</dt><dd data-out="total" data-catalog="ronde.300x120.total">1&#8239;759&nbsp;€</dd></div>
+          <div><dt data-out="remise-libelle">Livraison ou retrait</dt><dd data-out="livraison">À choisir</dd></div>
+          <div class="recap__total" aria-live="polite" aria-atomic="true"><dt data-out="total-libelle">Total hors livraison</dt><dd data-out="total" data-catalog="ronde.300x120.prix">1&#8239;399&nbsp;€</dd></div>
         </dl>
         <p class="recap__note" data-out="urbanisme"></p>
       </aside>
@@ -169,7 +169,7 @@
           <div class="champ champ--moitie">
             <label for="champ-telephone">Téléphone</label>
             <input id="champ-telephone" name="telephone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" aria-describedby="aide-telephone" required>
-            <small class="champ__aide" id="aide-telephone"><span data-remise="livraison">Pour que le transporteur puisse vous joindre.</span><span data-remise="retrait" hidden>Pour convenir avec vous du jour du retrait.</span></small>
+            <small class="champ__aide" id="aide-telephone"><span data-remise="">Pour vous joindre au sujet de votre commande.</span><span data-remise="livraison" hidden>Pour que le transporteur puisse vous joindre.</span><span data-remise="retrait" hidden>Pour convenir avec vous du jour du retrait.</span></small>
           </div>
           <div class="champ">
             <label for="champ-adresse">Adresse</label>
@@ -196,7 +196,7 @@
         </div>
         <p class="note-donnees">SAS Virage utilise ces informations pour traiter votre commande, la livrer et en assurer le suivi. Le paiement est confié à Stripe, les e-mails de commande à Brevo. Vos droits sont détaillés dans la <a href="/mentions-legales.html#confidentialite">politique de confidentialité</a>.</p>
         <div class="paiement">
-          <button class="bouton bouton--large" type="submit" data-payer aria-describedby="aide-paiement" disabled><span>Payer <span data-out="total" data-catalog="ronde.300x120.total">1&#8239;759&nbsp;€</span> en sécurisé</span></button>
+          <button class="bouton bouton--large" type="submit" data-payer aria-describedby="aide-paiement" disabled><span>Payer <span data-montant-paiement hidden><span data-out="total" data-catalog="ronde.300x120.prix">1&#8239;399&nbsp;€</span> </span>en sécurisé</span></button>
           <p class="paiement__aide" id="aide-paiement">Cochez la case ci-dessus pour activer le paiement.</p>
           <ul class="moyens" aria-label="Moyens de paiement acceptés">
             <li><svg class="moyen" viewBox="0 0 52 34" role="img" aria-label="Carte bancaire CB"><defs><linearGradient id="degrade-cb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00a19a"/><stop offset=".55" stop-color="#1569b0"/><stop offset="1" stop-color="#1b3f8f"/></linearGradient></defs><rect x="6" y="5" width="40" height="24" rx="3" fill="url(#degrade-cb)"/><text x="26" y="22.5" text-anchor="middle" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing=".5">CB</text></svg></li>

@@ -56,7 +56,7 @@ const CUSTOMER = {
 };
 
 function order(overrides) {
-  return Object.assign({ modele: 'ronde', taille: '300x120', montant: TOTAL, cgv: true, client: CUSTOMER }, overrides);
+  return Object.assign({ modele: 'ronde', taille: '300x120', remise: 'livraison', montant: TOTAL, cgv: true, client: CUSTOMER }, overrides);
 }
 
 function post(body, headers) {
@@ -291,7 +291,7 @@ test('create-payment : retrait possible avec une adresse hors métropole, pas la
 });
 
 test('create-payment : mode de remise inconnu refusé sans appeler Stripe', async () => {
-  for (const remise of ['', 'express', null, 0, 'toString', ['retrait']]) {
+  for (const remise of [undefined, '', 'express', null, 0, 'toString', ['retrait']]) {
     const response = await createPayment(post(order({ remise })));
     assert.equal(response.statusCode, 400, `remise ${JSON.stringify(remise)}`);
     assert.equal(JSON.parse(response.body).error, 'remise_invalide');
@@ -655,10 +655,10 @@ test('webhook : commande à retirer, e-mails adaptés et montant sans livraison 
   const [seller, customer] = brevoCalls();
   assert.ok(!seller.body.htmlContent.includes('Attention'), 'montant conforme pour un retrait');
   assert.match(seller.body.subject, /, retrait$/);
-  for (const expected of ['Retrait à Noisy-le-Grand', 'Adresse du client (facturation)', 'À remettre au client']) {
+  for (const expected of ['Retrait au dépôt de Noisy-le-Grand', 'Adresse du client (facturation)', 'À remettre au client']) {
     assert.ok(seller.body.htmlContent.includes(expected), `e-mail vendeur sans ${expected}`);
   }
-  for (const expected of ['Retrait à Noisy-le-Grand', 'Gratuit', 'adresse exacte du retrait', 'à compter du retrait']) {
+  for (const expected of ['Retrait au dépôt de Noisy-le-Grand', 'Gratuit', 'adresse exacte du retrait', 'à compter du retrait']) {
     assert.ok(customer.body.htmlContent.includes(expected), `e-mail client sans ${expected}`);
   }
   for (const mail of [seller, customer]) {

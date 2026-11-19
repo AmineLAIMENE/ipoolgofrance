@@ -259,7 +259,8 @@
     var planSvg = $('[data-plan]', root);
     var planParts = planSvg ? createPlan(planSvg) : null;
     var listeners = [];
-    var state = { model: fixedModel || catalog.MODEL_IDS[0], size: null, mode: catalog.DEFAULT_MODE };
+    // Fiche produit : prix livré. Page de commande : livraison ou retrait à choisir, rien de coché d'office.
+    var state = { model: fixedModel || catalog.MODEL_IDS[0], size: null, mode: isOrderForm ? null : catalog.DEFAULT_MODE };
 
     function checkedSize(modelId) {
       var input = $('input[name="taille-' + modelId + '"]:checked', root);
@@ -267,10 +268,11 @@
     }
 
     function render() {
-      var quote = catalog.quote(state.model, state.size, state.mode);
+      var chosen = Boolean(catalog.getMode(state.mode));
+      var quote = catalog.quote(state.model, state.size, chosen ? state.mode : 'retrait');
       if (!quote) return;
       var size = quote.size;
-      var pickup = quote.mode.id === 'retrait';
+      var pickup = chosen && quote.mode.id === 'retrait';
 
       $all('input[name="modele"]', root).forEach(function (input) {
         input.checked = input.value === state.model;
@@ -286,7 +288,10 @@
         input.checked = input.value === state.mode;
       });
       $all('[data-remise]', root).forEach(function (element) {
-        element.hidden = element.getAttribute('data-remise') !== state.mode;
+        element.hidden = element.getAttribute('data-remise') !== (state.mode || '');
+      });
+      $all('[data-montant-paiement]', root).forEach(function (element) {
+        element.hidden = !chosen;
       });
 
       var values = {
@@ -297,8 +302,9 @@
         volume: 'environ ' + litres(size.volume),
         emprise: decimal(catalog.groundArea(size)) + NBSP + 'm²',
         prix: catalog.formatEUR(quote.price),
-        livraison: quote.shipping > 0 ? catalog.formatEUR(quote.shipping) : pickup ? 'Gratuit' : 'Offerte',
-        'remise-libelle': quote.mode.label,
+        livraison: !chosen ? 'À choisir' : quote.shipping > 0 ? catalog.formatEUR(quote.shipping) : pickup ? 'Gratuit' : 'Offerte',
+        'remise-libelle': chosen ? quote.mode.label : 'Livraison ou retrait',
+        'total-libelle': chosen ? 'Total TTC' : 'Total hors livraison',
         total: catalog.formatEUR(quote.total),
         urbanisme: urbanismHint(size)
       };
@@ -325,7 +331,7 @@
       if (silent) return;
 
       var query = isOrderForm
-        ? '?modele=' + modelId + '&taille=' + sizeId + (state.mode !== catalog.DEFAULT_MODE ? '&remise=' + state.mode : '')
+        ? '?modele=' + modelId + '&taille=' + sizeId + (state.mode ? '&remise=' + state.mode : '')
         : '?taille=' + sizeId;
       try {
         history.replaceState(null, '', location.pathname + query + location.hash);
@@ -477,6 +483,32 @@
     });
     configurator.onChange(save);
 
+    // Livraison ou retrait : choix obligatoire, signalé sur le groupe de boutons.
+    var modeGroup = $('.remises', form);
+    var modeError = null;
+
+    function showModeError(text) {
+      if (!modeGroup) return;
+      if (!text) {
+        if (modeError) modeError.remove();
+        modeError = null;
+        modeGroup.closest('fieldset').removeAttribute('aria-describedby');
+        return;
+      }
+      if (!modeError) {
+        modeError = document.createElement('p');
+        modeError.className = 'champ__erreur';
+        modeError.id = 'erreur-remise';
+        modeGroup.parentNode.insertBefore(modeError, modeGroup.nextSibling);
+      }
+      modeError.textContent = text;
+      modeGroup.closest('fieldset').setAttribute('aria-describedby', modeError.id);
+    }
+
+    configurator.onChange(function (state) {
+      if (state.mode) showModeError('');
+    });
+
     cgv.addEventListener('change', function () {
       payButton.disabled = sending || !cgv.checked;
     });
@@ -486,6 +518,12 @@
       event.preventDefault();
       if (sending) return;
       showMessage('');
+
+      if (!catalog.getMode(configurator.state.mode)) {
+        showModeError('Choisissez la livraison en France métropolitaine ou le retrait au dépôt.');
+        $('input[name="remise"]', form).focus();
+        return;
+      }
 
       var customer = values();
       var errors = {};

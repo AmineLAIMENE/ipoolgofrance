@@ -106,8 +106,8 @@ exports.handler = async function handler(event) {
     return json(400, { error: 'requete_invalide', message: 'Requête refusée.' });
   }
 
-  // Sans mode indiqué, la commande est livrée.
-  const modeId = input.remise === undefined ? catalog.DEFAULT_MODE : input.remise;
+  // Livraison ou retrait : choix obligatoire du client.
+  const modeId = input.remise;
   if (!catalog.getMode(modeId)) {
     return json(400, { error: 'remise_invalide', message: 'Choisissez la livraison ou le retrait.' });
   }

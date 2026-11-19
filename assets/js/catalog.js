@@ -22,12 +22,13 @@
   // Livraison France métropolitaine, tarif unique en euros TTC (0 = livraison offerte).
   var SHIPPING_EUR = 360;
 
-  // Modes de remise proposés à la commande. Le retrait est gratuit, sur rendez-vous ;
+  // Modes de remise proposés à la commande, à choisir obligatoirement sur la page de
+  // commande (les fiches produit affichent le prix livré). Le retrait est gratuit, sur rendez-vous ;
   // l'adresse exacte est donnée au client par e-mail après la commande.
   var PICKUP_PLACE = 'Noisy-le-Grand';
   var DELIVERY_MODES = {
     livraison: { id: 'livraison', label: 'Livraison en France métropolitaine' },
-    retrait: { id: 'retrait', label: 'Retrait à ' + PICKUP_PLACE, free: true }
+    retrait: { id: 'retrait', label: 'Retrait au dépôt de ' + PICKUP_PLACE, free: true }
   };
   var DEFAULT_MODE = 'livraison';
 

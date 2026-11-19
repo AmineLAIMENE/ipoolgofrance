@@ -1475,6 +1475,13 @@ strong {
   gap: 0.6rem;
 }
 
+.legende__requis {
+  color: var(--encre-douce);
+  font-family: inherit;
+  font-size: 0.8em;
+  font-weight: 400;
+}
+
 .remise__note {
   margin: 0.75rem 0 0;
   padding: 0.7rem 0.9rem;

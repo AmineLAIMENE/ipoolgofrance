@@ -101,7 +101,7 @@ function sellerEmail(payment, env) {
   const warning = amountWarning(payment);
   const total = euros(payment.amount.value);
   const pickup = isPickup(metadata);
-  const pickupNote = `Retrait à ${catalog.PICKUP_PLACE} : contacter le client pour fixer le jour et lui donner l’adresse exacte.`;
+  const pickupNote = `Retrait au dépôt de ${catalog.PICKUP_PLACE} : contacter le client pour fixer le jour et lui donner l’adresse exacte.`;
   const addressTitle = pickup ? 'Adresse du client (facturation)' : 'Adresse de livraison (prête à copier)';
 
   const html = layout(
@@ -164,7 +164,7 @@ function customerEmail(payment, env) {
   const pickup = isPickup(metadata);
   const next = pickup
     ? [
-        `Votre piscine vous attend à ${catalog.PICKUP_PLACE} (Île-de-France). Nous vous appelons au ${metadata.telephone} ou vous écrivons sous 2 jours ouvrés pour convenir d’un créneau et vous donner l’adresse exacte du retrait.`,
+        `Votre piscine vous attend à notre dépôt de ${catalog.PICKUP_PLACE} (Île-de-France). Nous vous appelons au ${metadata.telephone} ou vous écrivons sous 2 jours ouvrés pour convenir d’un créneau et vous donner l’adresse exacte du retrait.`,
         'Prévoyez un véhicule assez grand pour les cartons. Contrôlez-les avec nous au moment du retrait.'
       ]
     : [
