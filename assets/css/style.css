@@ -620,38 +620,121 @@ strong {
   fill: #f2c14e;
 }
 
-.offre {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.15rem 1rem;
-  align-items: center;
-  max-width: 24rem;
-  padding: 1rem 1.25rem;
-  background: var(--sable);
-  border-radius: var(--rayon-moyen);
-  box-shadow: 0 20px 40px -24px rgb(0 0 0 / 55%);
+/* Encart cadeaux : bandeau en tête sur mobile, carte posée en haut à droite
+   de la photo sur ordinateur. */
+.hero__offre {
+  padding-block: 0.75rem 0.25rem;
 }
 
-.offre__valeur {
-  grid-row: span 2;
-  color: var(--lagon);
-  font-family: var(--titre);
-  font-size: 2.4rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.03em;
+.offre {
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 16px;
+  padding: 0.95rem 1rem 0.9rem;
+  color: var(--blanc);
+  background: linear-gradient(160deg, #0a7c84 0%, var(--lagon) 50%, var(--abysse) 100%);
+}
+
+.offre__ruban {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.6rem;
+  border-radius: 999px;
+  color: var(--blanc);
+  background: var(--corail);
+  font: 800 0.66rem/1 var(--texte);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.offre__ruban svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .offre__titre {
-  color: var(--encre);
-  font-weight: 700;
-  line-height: 1.25;
+  margin: 0.55rem 0 0.6rem;
+  color: var(--blanc);
+  font: 800 1.2rem/1.08 var(--titre);
+  letter-spacing: -0.02em;
 }
 
-.offre__detail {
-  color: var(--ambre);
-  font-size: 0.925rem;
-  line-height: 1.35;
+.offre__titre span {
+  color: var(--sable-fonce);
+}
+
+.offre__liste {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.offre__liste li {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 8%);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.offre__liste img {
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0.12rem;
+  border-radius: 7px;
+  background: var(--blanc);
+  object-fit: contain;
+}
+
+.offre__etat {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: rgb(255 255 255 / 65%);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.offre__etat s {
+  text-decoration-color: var(--corail);
+  text-decoration-thickness: 2px;
+}
+
+.offre__tag {
+  padding: 0.22rem 0.35rem;
+  border-radius: 4px;
+  color: var(--abysse);
+  background: var(--sable-fonce);
+  font: 800 0.62rem/1 var(--texte);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.offre__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0.6rem 0 0;
+  padding-top: 0.55rem;
+  border-top: 1px dashed rgb(255 255 255 / 28%);
+  color: rgb(255 255 255 / 85%);
+  font-size: 0.85rem;
+}
+
+.offre__total strong {
+  color: var(--sable-fonce);
+  font: 800 1.55rem/1 var(--titre);
 }
 
 @media (min-width: 60rem) {
@@ -701,8 +784,24 @@ strong {
     max-width: 31rem;
   }
 
-  .offre {
+  /* L'encart partage la cellule de la grille avec le texte, en haut à droite. */
+  .hero__offre,
+  .hero__grille {
+    grid-area: 1 / 1;
+  }
+
+  .hero__offre {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
     align-self: start;
+    padding-block: 2.5rem 0;
+  }
+
+  .offre {
+    width: 21rem;
+    box-shadow: 0 24px 50px -24px rgb(0 0 0 / 80%);
   }
 }
 
