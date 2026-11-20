@@ -294,8 +294,8 @@ function renderFeed() {
   catalog.MODEL_IDS.forEach((id) => {
     const model = catalog.MODELS[id];
     const extraImage = id === 'ronde'
-      ? '/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-jardin-1248.webp'
-      : '/assets/images/piscine-rectangulaire-ipoolgo-terrasse-1080.webp';
+      ? '/assets/images/piscine-gonflable-rigide-ipoolgo-ronde-jardin-provence-1248.webp'
+      : '/assets/images/piscine-rectangulaire-ipoolgo-terrasse-soir-1080.webp';
     model.sizes.forEach((size) => {
       const label = catalog.sizeLabel(size);
       // Pas de texte promotionnel dans le titre (refusé par Google) : les cadeaux vont dans product_highlight.
